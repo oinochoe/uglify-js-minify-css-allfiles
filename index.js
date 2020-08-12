@@ -32,13 +32,13 @@ const getAllFiles = (pathDir, arrayFiles) => {
         let code = fs.readFileSync(file, 'utf-8');
         if (file.includes(SUPPORT.JAVASCRIPT)) {
             try {
-                fs.writeFile(file, uglifyJS.minify(code).code);
+                fs.writeFile(file, uglifyJS.minify(code).code, function () {});
             } catch (error) {
                 console.log(error);
             }
         } else if (file.includes(SUPPORT.STYLESHEET)) {
             try {
-                fs.writeFile(file, new cleanCSS().minify(code).styles);
+                fs.writeFile(file, new cleanCSS().minify(code).styles, function () {});
             } catch (error) {
                 console.log(error);
             }
