@@ -22,15 +22,18 @@ const getAllFiles = (pathDir, arrayFiles) => {
         if (fs.statSync(pathDir + '/' + file).isDirectory()) {
             allFiles = getAllFiles(pathDir + '/' + file, allFiles);
         } else {
-            allFiles.push(path.join(__dirname, pathDir, '/', file));
+            if (file.includes(SUPPORT.JAVASCRIPT) || file.includes(SUPPORT.STYLESHEET)) {
+                allFiles.push(path.join(__dirname, pathDir, '/', file));
+            }
         }
     });
 
-    return allFiles.filter((e) => e.includes(SUPPORT.JAVASCRIPT) || e.includes(SUPPORT.STYLESHEET));
+    return allFiles;
 };
 
 // 지원하는 파일 형식 파일만 할당
 const setSupportFiles = getAllFiles(CONTENTSDIR);
+console.log(setSupportFiles);
 
 // 변경
 /* setSupportFiles.forEach((file) => {
