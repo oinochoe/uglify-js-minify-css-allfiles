@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const contentsDir = './contentsProject';
-const supportExtensions = '*.js, *.css';
+const supportExtensions = ['js', 'css'];
 
 // getAllFiles
 const getAllFiles = (pathDir, arrayFiles) => {
@@ -16,10 +16,12 @@ const getAllFiles = (pathDir, arrayFiles) => {
         }
     });
 
-    return allFiles;
+    return allFiles.filter(
+        (e) => e.includes(supportExtensions[0]) || e.includes(supportExtensions[1]),
+    );
 };
 
-getAllFiles(contentsDir);
+console.log(getAllFiles(contentsDir));
 /* let html = '';
 
 for (let index = 0; index < originSrc.length; index++) {
