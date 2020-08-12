@@ -1,4 +1,1 @@
-function dragon() {
-    return 6e3;
-}
-dragon();
+function dragon(){return 6e3}dragon();
