@@ -30,21 +30,18 @@ const getAllFiles = (pathDir, arrayFiles) => {
     // 지원하는 파일 형식 파일만 할당
     await getAllFiles(CONTENTSDIR).forEach((file) => {
         let code = fs.readFileSync(file, 'utf-8');
-        let result;
         if (file.includes(SUPPORT.JAVASCRIPT)) {
-            result = uglifyJS.minify(code);
-            fs.writeFile(file, result.code, function (err) {
-                if (err) {
-                    console.log(err);
-                }
-            });
+            try {
+                fs.writeFile(file, uglifyJS.minify(code).code);
+            } catch (error) {
+                console.log(error);
+            }
         } else if (file.includes(SUPPORT.STYLESHEET)) {
-            result = new cleanCSS().minify(code);
-            fs.writeFile(file, result.styles, function (err) {
-                if (err) {
-                    console.log(err);
-                }
-            });
+            try {
+                fs.writeFile(file, new cleanCSS().minify(code).styles);
+            } catch (error) {
+                console.log(error);
+            }
         }
     });
 })();
