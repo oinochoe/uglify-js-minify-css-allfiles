@@ -1,10 +1,26 @@
 const fs = require('fs');
-const origin = 'origin';
-const originSrc = fs
-    .readdirSync(origin);
-    .filter((file) => /\.css/.test(file))
-    .map((files) => `${origin}/${files}`);
-let html = '';
+const path = require('path');
+const contentsDir = './contentsProject';
+const supportExtensions = '*.js, *.css';
+
+// getAllFiles
+const getAllFiles = (pathDir, arrayFiles) => {
+    files = fs.readdirSync(pathDir);
+    allFiles = arrayFiles || [];
+
+    files.forEach((file) => {
+        if (fs.statSync(pathDir + '/' + file).isDirectory()) {
+            allFiles = getAllFiles(pathDir + '/' + file, allFiles);
+        } else {
+            allFiles.push(path.join(__dirname, pathDir, '/', file));
+        }
+    });
+
+    return allFiles;
+};
+
+getAllFiles(contentsDir);
+/* let html = '';
 
 for (let index = 0; index < originSrc.length; index++) {
     readFiles().then(function (resolveData) {
@@ -22,3 +38,4 @@ for (let index = 0; index < originSrc.length; index++) {
         });
     }
 }
+ */
