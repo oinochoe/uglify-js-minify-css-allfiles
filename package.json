@@ -16,5 +16,8 @@
     "bugs": {
         "url": "https://github.com/oinochoe/minify_contents/issues"
     },
-    "homepage": "https://github.com/oinochoe/minify_contents#readme"
+    "homepage": "https://github.com/oinochoe/minify_contents#readme",
+    "dependencies": {
+        "uglify-js": "^3.10.1"
+    }
 }

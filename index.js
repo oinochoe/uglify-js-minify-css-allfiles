@@ -1,12 +1,19 @@
 const fs = require('fs');
 const path = require('path');
-const contentsDir = './contentsProject';
+const uglifyJS = require('uglify-js');
+const CONTENTSDIR = './contentsProject';
 const SUPPORT = {
     JAVASCRIPT: 'js',
     STYLESHEET: 'css',
 };
-
-// getAllFiles
+/* var cacheFileName = '/tmp/cache.json';
+var options = {
+    mangle: {
+        properties: true,
+    },
+    nameCache: JSON.parse(fs.readFileSync(cacheFileName, 'utf8')),
+}; */
+// directory 나 array에서 모든 파일 가져오기
 const getAllFiles = (pathDir, arrayFiles) => {
     files = fs.readdirSync(pathDir);
     allFiles = arrayFiles || [];
@@ -22,23 +29,14 @@ const getAllFiles = (pathDir, arrayFiles) => {
     return allFiles.filter((e) => e.includes(SUPPORT.JAVASCRIPT) || e.includes(SUPPORT.STYLESHEET));
 };
 
-console.log(getAllFiles(contentsDir));
-/* let html = '';
+// 지원하는 파일 형식 파일만 할당
+const setSupportFiles = getAllFiles(CONTENTSDIR);
 
-for (let index = 0; index < originSrc.length; index++) {
-    readFiles().then(function (resolveData) {
-        console.log('dd');
-    });
-
-    function readFiles() {
-        return new Promise(function (resolve, reject) {
-            fs.readFile(originSrc[index], 'utf8', (error, data) => {
-                if (error) throw error;
-                console.log('읽기 완료');
-                html = data;
-                resolve(html);
-            });
-        });
-    }
-}
- */
+// 변경
+/* setSupportFiles.forEach((file) => {
+    fs.writeFileSync(
+        file.split('/').pop(),
+        UglifyJS.minify(fs.readFileSync(file.split('/').pop()), 'utf8'),
+    );
+    fs.writeFileSync(cacheFileName, JSON.stringify(options.nameCache), 'utf8');
+}); */
