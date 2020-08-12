@@ -27,8 +27,6 @@ const getAllFiles = (pathDir, arrayFiles) => {
 
 // 변경
 (async function changeFiles() {
-    const fileArray = (await getAllFiles(CONTENTSDIR)) || [];
-    if (fileArray == undefined || fileArray.length < 1) return;
     // 지원하는 파일 형식 파일만 할당
     await getAllFiles(CONTENTSDIR).forEach((file) => {
         let code = fs.readFileSync(file, 'utf-8');

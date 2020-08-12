@@ -17,10 +17,8 @@
         "url": "https://github.com/oinochoe/minify_contents/issues"
     },
     "homepage": "https://github.com/oinochoe/minify_contents#readme",
-    "dependencies": {
-        "uglify-js": "^3.10.1"
-    },
     "devDependencies": {
-        "clean-css": "^4.2.3"
+        "clean-css": "^4.2.3",
+        "uglify-js": "^3.10.1"
     }
 }
