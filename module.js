@@ -50,7 +50,7 @@ async function changeFiles() {
             errorFilesNumber += 1;
             return;
         } else {
-            fs.writeFile(file, result, function (error) {
+            fs.writeFile(file, result, 'utf-8', function (error) {
                 if (error) return console.log(error);
             });
         }
