@@ -54,6 +54,6 @@ async function changeFiles() {
         }
     }
 
-    console.log('success all files change');
+    console.log('file change ended');
 }
 exports.changeFiles = changeFiles;
