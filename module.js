@@ -7,6 +7,7 @@ const SUPPORT = {
     JAVASCRIPT: 'js',
     STYLESHEET: 'css',
 };
+let errorFilesNumber = 0;
 
 // directory 나 array에서 JS, CSS 모든 파일 가져오기
 const getAllFiles = (pathDir, arrayFiles) => {
@@ -44,8 +45,9 @@ async function changeFiles() {
 
     function writeFiles(file, result) {
         console.log(file);
-        if (typeof result === 'undefined') {
-            console.error('error file : ' + file);
+        if (typeof result == 'undefined' || result === '' || result === null) {
+            console.error('************error file*********** :  \n' + file);
+            errorFilesNumber += 1;
             return;
         } else {
             fs.writeFile(file, result, function (error) {
@@ -54,6 +56,6 @@ async function changeFiles() {
         }
     }
 
-    console.log('file change ended');
+    console.log('file change ended... errorFilesNumber : ' + errorFilesNumber);
 }
 exports.changeFiles = changeFiles;
