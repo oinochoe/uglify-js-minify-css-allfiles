@@ -2,7 +2,7 @@
     "name": "uglify-js & minify-css allfiles",
     "version": "1.0.0",
     "description": "you will be able to minify all files as same file names which is js or css",
-    "main": "index.js",
+    "main": "module.js",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1"
     },
