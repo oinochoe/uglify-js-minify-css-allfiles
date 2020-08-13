@@ -15,12 +15,12 @@ const getAllFiles = (pathDir, arrayFiles) => {
     let files = fs.readdirSync(pathDir) || [];
     let allFiles = arrayFiles || [];
     files.forEach((file) => {
+        fileExtension = file.split('.').pop();
+        if (fileExtension.match(SUPPORT.JAVASCRIPT) && fileExtension.match(SUPPORT.STYLESHEET) || fileExtension == 'json') { return; }
         if (fs.statSync(pathDir + '/' + file).isDirectory()) {
             allFiles = getAllFiles(pathDir + '/' + file, allFiles);
         } else {
-            if (file.includes(SUPPORT.JAVASCRIPT) || file.includes(SUPPORT.STYLESHEET)) {
-                allFiles.push(path.join(__dirname, pathDir, '/', file));
-            }
+            allFiles.push(path.join(__dirname, pathDir, '/', file));
         }
     });
     return allFiles;
@@ -35,10 +35,10 @@ async function changeFiles() {
     await getAllFiles(CONTENTSDIR).forEach((file) => {
         let code = fs.readFileSync(file, 'utf-8');
         let result = '';
-        if (file.includes(SUPPORT.JAVASCRIPT)) {
+        if (file.match(SUPPORT.JAVASCRIPT)) {
             result = uglifyJS.minify(code).code;
             writeFiles(file, result);
-        } else if (file.includes(SUPPORT.STYLESHEET)) {
+        } else if (file.match(SUPPORT.STYLESHEET)) {
             result = new cleanCSS().minify(code).styles;
             writeFiles(file, result);
         }
