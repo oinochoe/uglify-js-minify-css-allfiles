@@ -11,7 +11,7 @@ let errorFilesNumber = 0;
 
 // directory 나 array에서 JS, CSS 모든 파일 가져오기
 const getAllFiles = (pathDir, arrayFiles) => {
-    let files = fs.readdirSync(pathDir);
+    let files = fs.readdirSync(pathDir) || [];
     let allFiles = arrayFiles || [];
     files.forEach((file) => {
         if (fs.statSync(pathDir + '/' + file).isDirectory()) {
@@ -27,7 +27,7 @@ const getAllFiles = (pathDir, arrayFiles) => {
 
 // 변경
 async function changeFiles() {
-    let CONTENTSDIR = contentsPath.contentsPath;
+    let CONTENTSDIR = contentsPath.contentsPath || '';
     const fileArray = (await getAllFiles(CONTENTSDIR)) || [];
     if (fileArray == undefined || fileArray.length < 1) return;
     // 지원하는 파일 형식 파일만 할당
@@ -44,18 +44,18 @@ async function changeFiles() {
     });
 
     function writeFiles(file, result) {
-        console.log(file);
+        console.info(file);
         if (typeof result == 'undefined' || result === '' || result === null) {
             console.error('************error file*********** :  \n' + file);
             errorFilesNumber += 1;
             return;
         } else {
             fs.writeFile(file, result, 'utf-8', function (error) {
-                if (error) return console.log(error);
+                if (error) return console.error(error);
             });
         }
     }
 
-    console.log('file change ended... errorFilesNumber : ' + errorFilesNumber);
+    console.info('file change ended... errorFilesNumber : ' + errorFilesNumber);
 }
 exports.changeFiles = changeFiles;
