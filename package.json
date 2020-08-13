@@ -20,14 +20,19 @@
         "comporessor",
         "allfile minify"
     ],
-    "author": "yeongmin<copstyle86@gmail.com>",
-    "license": "ISC",
+    "author": {
+        "name": "yeongmin kim",
+        "email": "copstyle86@gmail.com",
+        "url": "https://oinochoe.github.io/portfolio/"
+    },
+    "license": "MIT",
     "bugs": {
-        "url": "https://github.com/oinochoe/minify_contents/issues"
+        "url": "https://github.com/oinochoe/minify_contents/issues",
+        "email": "copstyle86@gmail.com"
     },
     "homepage": "https://github.com/oinochoe/minify_contents#readme",
     "devDependencies": {
         "clean-css": "^4.2.3",
         "uglify-js": "^3.10.1"
-    }
+    },
 }
