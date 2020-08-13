@@ -43,13 +43,17 @@ async function changeFiles() {
     });
 
     function writeFiles(file, result) {
-        if (typeof result === 'undefined') throw console.error('file errors not changed');
-        fs.writeFile(file, result, function (error) {
-            if (error) return console.log(error);
-        });
+        console.log(file);
+        if (typeof result === 'undefined') {
+            console.error('error file : ' + file);
+            return;
+        } else {
+            fs.writeFile(file, result, function (error) {
+                if (error) return console.log(error);
+            });
+        }
     }
 
     console.log('success all files change');
 }
-
 exports.changeFiles = changeFiles;
