@@ -1,5 +1,5 @@
 {
-    "name": "uglify-js & minify-css allfiles",
+    "name": "uglify-js-minify-css-allfiles",
     "version": "1.0.0",
     "description": "you will be able to minify all files as same file names which is js or css",
     "main": "module.js",
