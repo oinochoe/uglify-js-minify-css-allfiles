@@ -1,7 +1,7 @@
 {
-    "name": "minify_contents",
+    "name": "uglify-js & minify-css allfiles",
     "version": "1.0.0",
-    "description": "",
+    "description": "you will be able to minify all files as same file names which is js or css",
     "main": "index.js",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1"
@@ -10,8 +10,17 @@
         "type": "git",
         "url": "git+https://github.com/oinochoe/minify_contents.git"
     },
-    "keywords": [],
-    "author": "",
+    "keywords": [
+        "uglify-js",
+        "minify",
+        "uglify",
+        "uglyjs",
+        "minifycss",
+        "miniCss",
+        "comporessor",
+        "allfile minify"
+    ],
+    "author": "yeongmin<copstyle86@gmail.com>",
     "license": "ISC",
     "bugs": {
         "url": "https://github.com/oinochoe/minify_contents/issues"
