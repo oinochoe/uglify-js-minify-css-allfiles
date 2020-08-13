@@ -9,11 +9,11 @@ just run minify.bat
 
 or
 
-node index.js
+node minify.js
 ```
 
 ## Others
 
 ```
-node index.js
+node minify.js
 ```
