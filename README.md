@@ -1,7 +1,11 @@
 # uglify-js and minify-css allFiles
 
 -   you will be able to minify all files as same file names which is js or css
--   bug fixed(1.1.0)
+
+## History
+- bug fixed(1.1.3) - 2020/08/15
+- you can use relative path
+
 
 ## Usage
 
@@ -18,6 +22,6 @@ yarn add clean-css uglify-js
 const minifyAll = require('uglify-js-minify-css-allfiles')
 
 # Folder Name (you will change all files in Folders)
-minifyAll('contentsProject');
+minifyAll('../test/');
 
 ```
