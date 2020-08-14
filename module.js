@@ -31,7 +31,9 @@ const getAllFiles = (pathDir, arrayFiles) => {
         if (fs.statSync(pathDir + '/' + file).isDirectory()) {
             allFiles = getAllFiles(pathDir + '/' + file, allFiles);
         } else {
-            allFiles.push(path.join(__dirname, pathDir, '/', file));
+            allFiles.push(
+                require('path').dirname(require.main.filename) + '\\' + pathDir + '\\' + file,
+            );
         }
     });
     return allFiles;
@@ -39,6 +41,7 @@ const getAllFiles = (pathDir, arrayFiles) => {
 
 // 변경
 module.exports = async function minifyAll(contentsPath) {
+    console.log(contentsPath);
     let CONTENTSDIR = contentsPath || '';
     const fileArray = (await getAllFiles(CONTENTSDIR)) || [];
     if (fileArray == undefined || fileArray.length < 1) return;
