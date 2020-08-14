@@ -1,6 +1,4 @@
-const { changeFiles } = require('./module');
-
-exports.contentsPath = './contentsProject/contents/';
+module.exports = require('./module');
 
 (async function () {
     await changeFiles().catch((e) => console.log(e));
