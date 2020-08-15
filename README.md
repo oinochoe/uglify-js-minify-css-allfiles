@@ -18,10 +18,17 @@ npm install clean-css uglify-js
 or
 
 yarn add clean-css uglify-js
+```
 
+```javascript
+// index.js
 const minifyAll = require('uglify-js-minify-css-allfiles')
 
-# Folder Name (you will change all files in Folders)
+// Folder Name (you will change all files in Folders)
 minifyAll('../test/');
+```
 
+## Excute
+```
+node index.js
 ```
