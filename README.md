@@ -7,6 +7,7 @@
 -   bug fixed(1.1.3) - 2020/08/15
 -   you can use relative path
 -   added exceptFolder parameter - 2020/08/20
+-   added command line execution with 2 parameters
 
 ## Usage
 
@@ -33,4 +34,8 @@ minifyAll('../test/', exceptFolder);
 
 ```
 node index.js
+
+or
+
+node index.js folderPath exceptionFolderPath
 ```
