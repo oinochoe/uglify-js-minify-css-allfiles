@@ -3,9 +3,10 @@
 -   you will be able to minify all files as same file names which is js or css
 
 ## History
-- bug fixed(1.1.3) - 2020/08/15
-- you can use relative path
 
+-   bug fixed(1.1.3) - 2020/08/15
+-   you can use relative path
+-   added exceptFolder parameter - 2020/08/20
 
 ## Usage
 
@@ -22,13 +23,14 @@ yarn add clean-css uglify-js
 
 ```javascript
 // index.js
-const minifyAll = require('uglify-js-minify-css-allfiles')
+const minifyAll = require('uglify-js-minify-css-allfiles');
 
 // Folder Name (you will change all files in Folders)
-minifyAll('../test/');
+minifyAll('../test/', exceptFolder);
 ```
 
 ## Excute
+
 ```
 node index.js
 ```

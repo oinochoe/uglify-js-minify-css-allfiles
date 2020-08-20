@@ -1,3 +1,3 @@
 const minifyAll = require('./minify.js');
 
-minifyAll('../test/');
+minifyAll('test/', 'lib');

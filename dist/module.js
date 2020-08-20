@@ -24,22 +24,24 @@ const getAllFiles = (pathDir, callback) => {
         let fileState = fs.statSync(filePath);
         if (fileState.isFile()) {
             callback(filePath, fileState);
-        } else if(fileState.isDirectory()){
+        } else if (fileState.isDirectory()) {
             getAllFiles(filePath, callback);
         }
     });
 };
 
 // minify All Files..
-module.exports = async function minifyAll(contentsPath) {
+module.exports = async function minifyAll(contentsPath, exceptFolder) {
     let CONTENTSDIR = contentsPath || '';
+    let EXCEPTIONFOLDER = exceptFolder || '';
     let result = '';
     getAllFiles(CONTENTSDIR, (paths) => {
         let code = fs.readFileSync(paths, 'utf-8');
+        if (EXCEPTIONFOLDER !== '' && paths.includes(EXCEPTIONFOLDER)) return;
         if (paths.substr(-3) === DIRECTORY.JAVASCRIPT) {
             result = uglifyJS.minify(code).code;
             writeFiles(paths, result);
-        } else if (paths.substr(-4) === DIRECTORY.STYLESHEET){
+        } else if (paths.substr(-4) === DIRECTORY.STYLESHEET) {
             result = new cleanCSS().minify(code).styles;
             writeFiles(paths, result);
         }
