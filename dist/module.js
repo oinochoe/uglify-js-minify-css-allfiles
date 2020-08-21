@@ -13,6 +13,9 @@ const DIRECTORY = {
     JAVASCRIPT: '.js',
     STYLESHEET: '.css',
 };
+const CSSOPTIONS = {
+    level: { 1: { all: false } },
+};
 let errorFilesNumber = 0;
 let errorFileObjects = [];
 
@@ -42,7 +45,7 @@ module.exports = async function minifyAll(contentsPath, exceptFolder) {
             result = uglifyJS.minify(code).code;
             writeFiles(paths, result);
         } else if (paths.substr(-4) === DIRECTORY.STYLESHEET) {
-            result = new cleanCSS({level:0}).minify(code).styles;
+            result = new cleanCSS(CSSOPTIONS).minify(code).styles;
             writeFiles(paths, result);
         }
     });

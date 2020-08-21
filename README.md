@@ -4,6 +4,7 @@
 
 ## History
 
+-   changed css option - solved cleancss commentary issue - 2020/08/21
 -   bug fixed(1.1.7) - solved cleancss first line delete error - 2020/08/21
 -   added command line execution with 2 parameters
 -   added exceptFolder parameter - 2020/08/20
@@ -28,12 +29,10 @@ yarn add clean-css uglify-js
 const minifyAll = require('uglify-js-minify-css-allfiles');
 
 // Folder Name (you will change all files in Folders)
-(1)
+1;
 minifyAll('../test/', exceptFolder);
 
-or
-
-(2)
+or(2);
 minifyAll(process.argv.slice(2)[0], process.argv.slice(2)[1]);
 ```
 
