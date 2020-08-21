@@ -28,11 +28,11 @@ yarn add clean-css uglify-js
 // index.js
 const minifyAll = require('uglify-js-minify-css-allfiles');
 
-// Folder Name (you will change all files in Folders)
-1;
-minifyAll('../test/', exceptFolder);
+// param1 : path you will change , param2 : folder or file name you want to take off
+// (1)
+minifyAll('../test/', 'lib');
 
-or(2);
+// (2)
 minifyAll(process.argv.slice(2)[0], process.argv.slice(2)[1]);
 ```
 
