@@ -1,9 +1,14 @@
 # uglify-js and minify-css allFiles
 
 -   you will be able to minify all files as same file names which is js or css
+-   you are able to minify all files in a specific folder.
+-   you can do this easily via `demo.js` file in `node_modules/uglify-js-minify-css-allfiles`
+-   if you have a question or some problem, contact me anywhen.
+-   please email me copstyle86@gmail.com or use github issue tab.
 
 ## History
 
+-   DevDependencies to Dependencies for this production - 2020/08/26
 -   changed css option - solved cleancss commentary issue - 2020/08/21
 -   bug fixed(1.1.7) - solved cleancss first line delete error - 2020/08/21
 -   added command line execution with 2 parameters
@@ -17,11 +22,9 @@
 
 npm install uglify-js-minify-css-allfiles
 
-npm install clean-css uglify-js
-
 or
 
-yarn add clean-css uglify-js
+yarn add uglify-js-minify-css-allfiles
 ```
 
 ```javascript
