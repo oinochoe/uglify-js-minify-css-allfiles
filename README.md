@@ -31,7 +31,8 @@ yarn add uglify-js-minify-css-allfiles
 // index.js
 const minifyAll = require('uglify-js-minify-css-allfiles');
 
-// param1 : path you will change , param2 : folder or file name you want to take off
+// param1 : Type a path you will change all files inside this path
+// param2 : folder or file name you want to take off
 // (1)
 minifyAll('../test/', 'lib');
 
