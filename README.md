@@ -7,7 +7,7 @@
 -   please email me copstyle86@gmail.com or use github issue tab.
 
 ## History
-
+-   UglifyJS Updated and you can uglify js even es6 sentences! - 2020/11/03
 -   DevDependencies to Dependencies for this production - 2020/08/26
 -   changed css option - solved cleancss commentary issue - 2020/08/21
 -   bug fixed(1.1.7) - solved cleancss first line delete error - 2020/08/21

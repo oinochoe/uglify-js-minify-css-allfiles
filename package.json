@@ -1,6 +1,6 @@
 {
     "name": "uglify-js-minify-css-allfiles",
-    "version": "1.2.1",
+    "version": "1.2.2",
     "description": "you will be able to minify all files as same file names which is js or css",
     "main": "minify.js",
     "scripts": {
@@ -12,13 +12,17 @@
     },
     "keywords": [
         "uglify-js",
-        "minify",
-        "uglify",
-        "uglyjs",
+        "minify-es6",
+        "uglifyjs-es6",
+        "uglifyjs2",
         "minifycss",
         "miniCss",
+        "cleanCss",
+        "minifyCss",
         "comporessor",
-        "allfile minify"
+        "allfile minify",
+        "allfiles minify",
+        "all files uglify"
     ],
     "author": {
         "name": "yeongmin kim",
@@ -33,6 +37,9 @@
     "homepage": "https://github.com/oinochoe/minify_contents#readme",
     "dependencies": {
         "clean-css": "^4.2.3",
-        "uglify-js": "^3.10.1"
+        "uglify-js-es6": "^2.8.9"
+    },
+    "devDependencies": {
+        "uglify-js": "github:mishoo/UglifyJS2#harmony"
     }
 }
