@@ -1,6 +1,6 @@
 {
     "name": "uglify-js-minify-css-allfiles",
-    "version": "1.2.6",
+    "version": "1.2.7",
     "description": "you will be able to minify all files as same file names which is js or css",
     "main": "minify.js",
     "scripts": {
