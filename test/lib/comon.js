@@ -1,3 +1,1 @@
-function dragon() {
-    console.log('sdasfasd');
-}
+function dragon(){console.assert("sdsfdsd")}

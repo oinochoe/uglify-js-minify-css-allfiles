@@ -43,9 +43,9 @@ module.exports = async function minifyAll(contentsPath, exceptFolder) {
         if (EXCEPTIONFOLDER !== '' && paths.includes(EXCEPTIONFOLDER)) return;
         if (paths.substr(-3) === DIRECTORY.JAVASCRIPT) {
             result = uglifyJS.minify(code, {
-                compress:{
-                    pure_funcs: [ 'console.log' ]
-                }
+                compress: {
+                    pure_funcs: ['console.log', 'console.error', 'console.warn', 'console.info'],
+                },
             }).code;
             writeFiles(paths, result);
         } else if (paths.substr(-4) === DIRECTORY.STYLESHEET) {
