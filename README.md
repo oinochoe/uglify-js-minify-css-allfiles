@@ -7,6 +7,7 @@
 -   please email me copstyle86@gmail.com or use github issue tab.
 
 ## History
+-   UglifyJS Updated removing 'console.info, console.warn, console.error'. - 2021/11/12
 -   UglifyJS Updated working without 'console.log' not console.error, info etc. - 2021/03/17
 -   UglifyJS Updated and you can uglify js even es6 sentences! - 2020/11/03
 -   DevDependencies to Dependencies for this production - 2020/08/26
