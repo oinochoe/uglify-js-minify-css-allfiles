@@ -49,8 +49,16 @@ module.exports = async function minifyAll(contentsPath, exceptFolder) {
             }).code;
             writeFiles(paths, result);
         } else if (paths.substr(-4) === DIRECTORY.STYLESHEET) {
-            result = new cleanCSS(CSSOPTIONS).minify(code).styles;
-            writeFiles(paths, result);
+            new cleanCSS(CSSOPTIONS).minify(code, function (error, output) {
+                if (0 < output.warnings.length) {
+                    console.error('CSS FILE ERROR!', output.warnings);
+                    writeFiles(paths, null);
+                    return;
+                } else {
+                    result = new cleanCSS(CSSOPTIONS).minify(code).styles;
+                    writeFiles(paths, result);
+                }
+            });
         }
     });
 
@@ -74,6 +82,8 @@ module.exports = async function minifyAll(contentsPath, exceptFolder) {
         }
     }
 
-    console.info('file change ended... \nerrorFilesNumber : ' + errorFilesNumber);
-    console.info('*******errorFileObjects******* : ' + errorFileObjects);
+    if (0 < errorFileObjects.length) {
+        console.info('file change ended... \nerrorFilesNumber : ' + errorFilesNumber);
+        console.info('*******errorFileObjects******* : ' + errorFileObjects);
+    }
 };
