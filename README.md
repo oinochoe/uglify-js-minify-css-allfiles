@@ -1,4 +1,4 @@
-# uglify-js and minify-css allFiles
+# Ugly-Code
 
 -   you will be able to minify all files as same file names which is js or css
 -   you are able to minify all files in a specific folder.
