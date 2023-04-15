@@ -2,7 +2,7 @@
 
 -   you will be able to minify all files as same file names which is js or css
 -   you are able to minify all files in a specific folder.
--   you can do this easily via `demo.js` file in `node_modules/uglify-js-minify-css-allfiles`
+-   you can do this easily via `demo.js` file in `node_modules/ugly-code`
 -   if you have a question or some problem, contact me anywhen.
 -   please email me copstyle86@gmail.com or use github issue tab.
 
@@ -23,16 +23,16 @@
 
 ```
 
-npm install uglify-js-minify-css-allfiles
+npm install ugly-code
 
 or
 
-yarn add uglify-js-minify-css-allfiles
+yarn add ugly-code
 ```
 
 ```javascript
 // index.js
-const minifyAll = require('uglify-js-minify-css-allfiles');
+const minifyAll = require('ugly-code');
 
 // param1 : Type a path you will change all files inside this path
 // param2 : folder or file name you want to take off
