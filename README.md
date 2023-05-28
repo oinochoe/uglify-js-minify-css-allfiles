@@ -11,9 +11,9 @@
 [donate-url]: https://github.com/sponsors/oinochoe
 [create-pr]: https://github.com/oinochoe/ugly-code/pulls
 
-# Ugly-Code
+# uglify-js-minify-css-allfiles
 
-Ugly-Code helps hide the code you don't want to see, obfuscate the code in the deployment environment through a simple CLI in the build environment, and make it less recognizable to others. you can do this easily via `demo.js` file in `node_modules/ugly-code`. you are able to minify all files in a specific folder.
+uglify-js-minify-css-allfiles helps hide the code you don't want to see, obfuscate the code in the deployment environment through a simple CLI in the build environment, and make it less recognizable to others. you can do this easily via `demo.js` file in `node_modules/uglify-js-minify-css-allfiles`. you are able to minify all files in a specific folder.
 
 [![NPM](https://nodei.co/npm/uglify-js-minify-css-allfiles.png?downloads=true&stars=true)](https://www.npmjs.com/package/uglify-js-minify-css-allfiles)
 
@@ -33,14 +33,14 @@ Ugly-Code helps hide the code you don't want to see, obfuscate the code in the d
 Install with `npm`:
 
 ```bash
-$ npm i ugly-code
+$ npm i uglify-js-minify-css-allfiles
 ```
 
 ## Examples
 
 ```js
 // index.js
-const minifyAll = require('ugly-code');
+const minifyAll = require('uglify-js-minify-css-allfiles');
 
 /**
  * @param1 - Type the folder name you want to change all files inside.
