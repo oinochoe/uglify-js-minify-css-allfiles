@@ -1,58 +1,80 @@
+[![NPM downloads][npm-downloads]][npm-url]
+[![NPM total downloads][npm-total-downloads]][npm-url]
+
+| &nbsp;<br>[![Donate][donate-badge]][donate-url] <br>&nbsp; | Your help is appreciated! [Create a PR][create-pr] or just [buy me a coffee][donate-url] |
+| ---------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
+
+[npm-url]: https://www.npmjs.com/package/uglify-js-minify-css-allfiles
+[npm-downloads]: https://img.shields.io/npm/dm/uglify-js-minify-css-allfiles.svg
+[npm-total-downloads]: https://img.shields.io/npm/dt/uglify-js-minify-css-allfiles.svg?label=total+downloads
+[donate-badge]: https://img.shields.io/badge/Buy%20me%20a%20coffee-Donate-red.svg
+[donate-url]: https://github.com/sponsors/oinochoe
+[create-pr]: https://github.com/oinochoe/ugly-code/pulls
+
 # Ugly-Code
 
--   you will be able to minify all files as same file names which is js or css
--   you are able to minify all files in a specific folder.
--   you can do this easily via `demo.js` file in `node_modules/ugly-code`
--   if you have a question or some problem, contact me anywhen.
--   please email me copstyle86@gmail.com or use github issue tab.
+Ugly-Code helps hide the code you don't want to see, obfuscate the code in the deployment environment through a simple CLI in the build environment, and make it less recognizable to others. you can do this easily via `demo.js` file in `node_modules/ugly-code`. you are able to minify all files in a specific folder.
 
-## History
--   When Css Warnings is exist, not minify any code - 2022/04/13
--   UglifyJS Updated removing 'console.info, console.warn, console.error'. - 2021/11/12
--   UglifyJS Updated working without 'console.log' not console.error, info etc. - 2021/03/17
--   UglifyJS Updated and you can uglify js even es6 sentences! - 2020/11/03
--   DevDependencies to Dependencies for this production - 2020/08/26
--   changed css option - solved cleancss commentary issue - 2020/08/21
--   bug fixed(1.1.7) - solved cleancss first line delete error - 2020/08/21
--   added command line execution with 2 parameters
--   added exceptFolder parameter - 2020/08/20
--   you can use relative path
--   bug fixed(1.1.3) - 2020/08/15
+[![NPM](https://nodei.co/npm/uglify-js-minify-css-allfiles.png?downloads=true&stars=true)](https://www.npmjs.com/package/uglify-js-minify-css-allfiles)
 
-## Usage
+---
 
+## Table of Contents
+
+-   [Installation](#installation)
+-   [Examples](#examples)
+-   [Changelog](#changelog)
+-   [License](#license)
+<!-- -   [API](#api)
+    -   [`Methods`](#methods) -->
+
+## Installation
+
+Install with `npm`:
+
+```bash
+$ npm i ugly-code
 ```
 
-npm install ugly-code
+## Examples
 
-or
-
-yarn add ugly-code
-```
-
-```javascript
+```js
 // index.js
 const minifyAll = require('ugly-code');
 
-// param1 : Type a path you will change all files inside this path
-// param2 : folder or file name you want to take off
-// (1)
+/**
+ * @param1 - Type the folder name you want to change all files inside.
+ * @param2 - Type the folder name you never want to change all files inside.
+ * @functions - minifyAll(minifyFolder, noMinifyFolder)
+ */
+
+// Example 1
 minifyAll('../test/', 'lib');
 
-// (2)
+// Example 2
 minifyAll(process.argv.slice(2)[0], process.argv.slice(2)[1]);
 ```
 
-## Excute
+<!--
+## API
 
-```
-(1)
-node index.js
+### `Methods`
 
-or
+Create a new progress bar. It's necessary to wait for the [`ready` event](https://github.com/electron/electron/blob/master/docs/api/app.md#event-ready) to be emitted by [Electron's BrowserWindow](https://github.com/electron/electron/blob/master/docs/api/browser-window.md), since the progress bar is displayed within it. Optionally, you can pass the electron app as a second parameter (parameter `electronApp`) when creating the progress bar. Check the sample code on this page for detailed examples on how to set properties to `options`.
 
-(2)
-node index.js folderPath exceptionFolderPath
-```
-<!-- 
-<a href="https://www.buymeacoffee.com/eYs1lFK" target="_blank"><img src="https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png" alt="Buy Me A Coffee" style="height: 41px !important;width: 174px !important;box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;-webkit-box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;" ></a> -->
+You can define most of the characteristics of the progress bar using the `options` parameter. Below is a list of properties that you can set for the `options` parameter.
+
+| Option name  | Type                 | Default value      | Description                                                                                                                                                                                                            |
+| ------------ | -------------------- | ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| debug        | <code>boolean</code> | <code>false</code> | Specifies whether debugging should be enabled. If set to `true`, the browser's DevTools panel will automatically open when the progress bar is created. This can be helpful when debugging and/or dealing with issues. |
+| abortOnError | <code>boolean</code> | <code>false</code> | Specifies whether the progress bar should automatically abort and close if an error occurs internally.                                                                                                                 | -->
+
+---
+
+## Changelog
+
+[Changelog](/CHANGELOG.md)
+
+## License
+
+MIT. See [LICENSE.md](https://github.com/oinochoe/ugly-code/blob/master/LICENSE) for details.
