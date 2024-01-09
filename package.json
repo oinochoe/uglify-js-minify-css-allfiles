@@ -8,7 +8,7 @@
     },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/oinochoe/ugly-code.git"
+        "url": "git+https://github.com/oinochoe/uglify-js-minify-css-allfiles.git"
     },
     "publishConfig": {
         "registry": "https://npm.pkg.github.com/"
@@ -35,10 +35,10 @@
     },
     "license": "MIT",
     "bugs": {
-        "url": "https://github.com/oinochoe/ugly-code/issues",
+        "url": "https://github.com/oinochoe/uglify-js-minify-css-allfiles/issues",
         "email": "copstyle86@gmail.com"
     },
-    "homepage": "https://github.com/oinochoe/ugly-code#readme",
+    "homepage": "https://github.com/oinochoe/uglify-js-minify-css-allfiles#readme",
     "dependencies": {
         "clean-css": "^4.2.3",
         "uglify-js-es6": "^2.8.9"

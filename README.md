@@ -9,7 +9,7 @@
 [npm-total-downloads]: https://img.shields.io/npm/dt/uglify-js-minify-css-allfiles.svg?label=total+downloads
 [donate-badge]: https://img.shields.io/badge/Buy%20me%20a%20coffee-Donate-red.svg
 [donate-url]: https://github.com/sponsors/oinochoe
-[create-pr]: https://github.com/oinochoe/ugly-code/pulls
+[create-pr]: https://github.com/oinochoe/uglify-js-minify-css-allfiles/pulls
 
 # uglify-js-minify-css-allfiles
 
@@ -77,4 +77,4 @@ You can define most of the characteristics of the progress bar using the `option
 
 ## License
 
-MIT. See [LICENSE.md](https://github.com/oinochoe/ugly-code/blob/master/LICENSE) for details.
+MIT. See [LICENSE.md](https://github.com/oinochoe/uglify-js-minify-css-allfiles/blob/master/LICENSE) for details.
