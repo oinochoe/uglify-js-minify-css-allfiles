@@ -1,89 +1,81 @@
 /**
- * uglify-js and minify-css allFiles
+ * uglify-js and minify-css for all files
  * Released under the terms of MIT license
  *
- * Copyright (C) 2020 yeongmin
+ * Copyright (C) 2024 yeongmin
  */
 
-const fs = require('fs');
-const path = require('path');
-const uglifyJS = require('uglify-js');
-const cleanCSS = require('clean-css');
-const DIRECTORY = {
-    JAVASCRIPT: '.js',
-    STYLESHEET: '.css',
-};
-const CSSOPTIONS = {
-    level: { 1: { all: false } },
-};
-let errorFilesNumber = 0;
-let errorFileObjects = [];
+import { promises as fs } from 'fs';
+import path from 'path';
+import Logger from './modules/logger.js';
+import { getAllFiles, writeFile } from './modules/fileHandler.js';
+import { minifyJS, minifyCSS } from './modules/minifier.js';
 
-// getFiles..
-const getAllFiles = (pathDir, callback) => {
-    let files = fs.readdirSync(pathDir) || [];
-    files.forEach((name) => {
-        let filePath = path.join(pathDir, name);
-        let fileState = fs.statSync(filePath);
-        if (fileState.isFile()) {
-            callback(filePath, fileState);
-        } else if (fileState.isDirectory()) {
-            getAllFiles(filePath, callback);
-        }
-    });
-};
-
-// minify All Files..
-module.exports = async function minifyAll(contentsPath, exceptFolder) {
-    let CONTENTSDIR = contentsPath || '';
-    let EXCEPTIONFOLDER = exceptFolder || '';
-    let result = '';
-    getAllFiles(CONTENTSDIR, (paths) => {
-        let code = fs.readFileSync(paths, 'utf-8');
-        if (EXCEPTIONFOLDER !== '' && paths.includes(EXCEPTIONFOLDER)) return;
-        if (paths.substr(-3) === DIRECTORY.JAVASCRIPT) {
-            result = uglifyJS.minify(code, {
-                compress: {
-                    pure_funcs: ['console.log', 'console.error', 'console.warn', 'console.info'],
-                },
-            }).code;
-            writeFiles(paths, result);
-        } else if (paths.substr(-4) === DIRECTORY.STYLESHEET) {
-            new cleanCSS(CSSOPTIONS).minify(code, function (error, output) {
-                if (0 < output.warnings.length) {
-                    console.error('CSS FILE ERROR!', output.warnings);
-                    writeFiles(paths, null);
-                    return;
-                } else {
-                    result = new cleanCSS(CSSOPTIONS).minify(code).styles;
-                    writeFiles(paths, result);
-                }
-            });
-        }
-    });
-
-    // writeFiles..
-    function writeFiles(file, value) {
-        // exception..
-        if (typeof value == 'undefined' || value === '' || value === null) {
-            console.error(
-                '************error file ㅜㅜㅜㅜ***********\n' +
-                    file +
-                    '\n **********ㅗㅗㅗㅗㅗ error file********',
-            );
-            errorFilesNumber += 1;
-            errorFileObjects.push(file);
-            return;
+const FILE_HANDLERS = {
+    '.js': async (filePath, content, logger) => {
+        const result = minifyJS(content);
+        await writeFile(filePath, result, logger);
+    },
+    '.css': async (filePath, content, logger) => {
+        const output = await minifyCSS(content);
+        if (output.warnings.length > 0) {
+            await logger.logError(filePath, `CSS warnings: ${output.warnings.join(', ')}`);
+            await writeFile(filePath, null, logger);
         } else {
-            console.info(file);
-            fs.writeFile(file, value, 'utf-8', function (error) {
-                if (error) return console.error(error);
-            });
+            await writeFile(filePath, output.styles, logger);
         }
-    }
-
-    if (0 < errorFileObjects.length) {
-        console.info('file change ended... \nerrorFilesNumber : ' + errorFilesNumber);
-        console.info('*******errorFileObjects******* : ' + errorFileObjects);
-    }
+    },
 };
+
+/**
+ * Processes a single file based on its extension.
+ * @async
+ * @param {string} filePath - The path of the file to process.
+ * @param {Logger} logger - The logger instance.
+ * @returns {Promise<void>}
+ */
+async function processFile(filePath, logger) {
+    const fileContent = await fs.readFile(filePath, 'utf-8');
+    const fileExtension = path.extname(filePath);
+    const handler = FILE_HANDLERS[fileExtension];
+
+    if (handler) {
+        await handler(filePath, fileContent, logger);
+    } else {
+        logger.logInfo(`Skipping unsupported file type: ${filePath}`);
+    }
+}
+
+/**
+ * Minifies all JavaScript and CSS files in the specified directory and its subdirectories.
+ *
+ * @async
+ * @function minifyAll
+ * @param {string} contentPath - The path to the directory containing the files to be minified.
+ * @param {string} [excludeFolder=''] - The name of a folder to exclude from minification.
+ * @returns {Promise<void>} A promise that resolves when all files have been processed.
+ * @throws {Error} If there's an issue reading or writing files.
+ *
+ * @example
+ * // Minify all files in './test/' directory, excluding 'lib' folder
+ * import minifyAll from './main.js';
+ * await minifyAll('./test/', 'lib');
+ *
+ * @example
+ * // Minify all files in a directory specified as a command line argument
+ * import minifyAll from './main.js';
+ * await minifyAll(process.argv[2], process.argv[3]);
+ */
+export default async function minifyAll(contentPath, excludeFolder = '') {
+    const logger = new Logger();
+    await logger.initialize();
+
+    const rootDir = contentPath || '';
+
+    await getAllFiles(rootDir, async (filePath) => {
+        if (excludeFolder && filePath.includes(excludeFolder)) return;
+        await processFile(filePath, logger);
+    });
+
+    await logger.summarize();
+}

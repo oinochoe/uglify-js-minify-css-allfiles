@@ -1,1 +1,0 @@
-var dragon=()=>{alert("dd")};

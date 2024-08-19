@@ -13,7 +13,9 @@
 
 # uglify-js-minify-css-allfiles
 
-uglify-js-minify-css-allfiles helps hide the code you don't want to see, obfuscate the code in the deployment environment through a simple CLI in the build environment, and make it less recognizable to others. you can do this easily via `demo.js` file in `node_modules/uglify-js-minify-css-allfiles`. you are able to minify all files in a specific folder.
+A powerful tool to minify and obfuscate JavaScript and CSS files in your project.  
+It helps protect your code in deployment environments and makes it less recognizable to others, all through a simple CLI interface.  
+You can easily minify all files in a specific folder, with the option to exclude certain directories.
 
 [![NPM](https://nodei.co/npm/uglify-js-minify-css-allfiles.png?downloads=true&stars=true)](https://www.npmjs.com/package/uglify-js-minify-css-allfiles)
 
@@ -22,11 +24,9 @@ uglify-js-minify-css-allfiles helps hide the code you don't want to see, obfusca
 ## Table of Contents
 
 -   [Installation](#installation)
--   [Examples](#examples)
+-   [Usage](#usage)
 -   [Changelog](#changelog)
 -   [License](#license)
-<!-- -   [API](#api)
-    -   [`Methods`](#methods) -->
 
 ## Installation
 
@@ -36,42 +36,36 @@ Install with `npm`:
 $ npm i uglify-js-minify-css-allfiles
 ```
 
-## Examples
+## Usage
+
+Import the module in your script:
 
 ```js
-// index.js
-const minifyAll = require('uglify-js-minify-css-allfiles');
+import minifyAll from './dist/module.js';
 
 /**
- * @param1 - Type the folder name you want to change all files inside.
- * @param2 - Type the folder name you never want to change all files inside.
- * @functions - minifyAll(minifyFolder, noMinifyFolder)
+ * @param {string} minifyFolder - The folder containing files to minify.
+ * @param {string} [excludeFolder] - The folder to exclude from minification (optional).
  */
 
-// Example 1
-minifyAll('../test/', 'lib');
-
-// Example 2
-minifyAll(process.argv.slice(2)[0], process.argv.slice(2)[1]);
+minifyAll(minifyFolder, excludeFolder);
 ```
 
-<!--
-## API
+Execute script:
 
-### `Methods`
+```js
+import minifyAll from 'uglify-js-minify-css-allfiles';
 
-Create a new progress bar. It's necessary to wait for the [`ready` event](https://github.com/electron/electron/blob/master/docs/api/app.md#event-ready) to be emitted by [Electron's BrowserWindow](https://github.com/electron/electron/blob/master/docs/api/browser-window.md), since the progress bar is displayed within it. Optionally, you can pass the electron app as a second parameter (parameter `electronApp`) when creating the progress bar. Check the sample code on this page for detailed examples on how to set properties to `options`.
+// Example 1: Minify all files in '../test/' except those in 'lib' folder
+minifyAll('../test/', 'lib');
 
-You can define most of the characteristics of the progress bar using the `options` parameter. Below is a list of properties that you can set for the `options` parameter.
-
-| Option name  | Type                 | Default value      | Description                                                                                                                                                                                                            |
-| ------------ | -------------------- | ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| debug        | <code>boolean</code> | <code>false</code> | Specifies whether debugging should be enabled. If set to `true`, the browser's DevTools panel will automatically open when the progress bar is created. This can be helpful when debugging and/or dealing with issues. |
-| abortOnError | <code>boolean</code> | <code>false</code> | Specifies whether the progress bar should automatically abort and close if an error occurs internally.                                                                                                                 | -->
-
----
+// Example 2: Use command line arguments
+minifyAll(process.argv[2], process.argv[3]);
+```
 
 ## Changelog
+
+See CHANGELOG.md for details on each release.
 
 [Changelog](/CHANGELOG.md)
 
