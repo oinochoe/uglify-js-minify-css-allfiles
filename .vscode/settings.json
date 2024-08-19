@@ -3,6 +3,8 @@
         "allfile",
         "allfiles",
         "comporessor",
+        "corejs",
+        "esmodules",
         "minifycss",
         "oinochoe",
         "uglifyjs",

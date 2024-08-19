@@ -44,5 +44,9 @@
         "clean-css": "^4.2.4",
         "uglify-js": "^3.19.2",
         "uglify-js-es6": "^2.8.9"
+    },
+    "devDependencies": {
+        "@babel/core": "^7.25.2",
+        "@babel/preset-env": "^7.25.3"
     }
 }
