@@ -1,1 +1,3 @@
-module.exports = require('./dist/module');
+import minifyAll from './dist/module';
+
+export default minifyAll;
