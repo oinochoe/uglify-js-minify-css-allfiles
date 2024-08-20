@@ -25,6 +25,8 @@ You can easily minify all files in a specific folder, with the option to exclude
 
 -   [Installation](#installation)
 -   [Usage](#usage)
+-   [Parameters](#parameters)
+-   [BabelOptions](#babeloptions)
 -   [Changelog](#changelog)
 -   [License](#license)
 
@@ -38,30 +40,59 @@ $ npm i uglify-js-minify-css-allfiles
 
 ## Usage
 
-Import the module in your script:
+1. Basic usage (no Babel):
 
-```js
-import minifyAll from './dist/module.js';
+    ```js
+    import minifyAll from 'uglify-js-minify-css-allfiles';
 
-/**
- * @param {string} minifyFolder - The folder containing files to minify.
- * @param {string} [excludeFolder] - The folder to exclude from minification (optional).
- */
+    await minifyAll('./src/', 'node_modules');
+    ```
 
-minifyAll(minifyFolder, excludeFolder);
-```
+2. Using Babel with default settings:
 
-Execute script:
+    ```js
+    import minifyAll from 'uglify-js-minify-css-allfiles';
 
-```js
-import minifyAll from 'uglify-js-minify-css-allfiles';
+    await minifyAll('./src/', 'node_modules', { useBabel: true });
+    ```
 
-// Example 1: Minify all files in '../test/' except those in 'lib' folder
-minifyAll('../test/', 'lib');
+3. Using custom Babel presets:
 
-// Example 2: Use command line arguments
-minifyAll(process.argv[2], process.argv[3]);
-```
+    ```js
+    import minifyAll from 'uglify-js-minify-css-allfiles';
+
+    await minifyAll('./src/', 'node_modules', {
+        presets: [
+            [
+                '@babel/preset-env',
+                {
+                    targets: {
+                        esmodules: false, // Target ES2015
+                    },
+                },
+            ],
+        ],
+    });
+    ```
+
+## Parameters
+
+The `minifyAll` function accepts the following parameters:
+
+| Parameter       | Type           | Default | Description                                                                                  |
+| --------------- | -------------- | ------- | -------------------------------------------------------------------------------------------- |
+| `contentPath`   | string         | -       | The path to the directory containing the files to be minified. This is a required parameter. |
+| `excludeFolder` | string         | `''`    | The name of a folder to exclude from minification. Leave empty to include all folders.       |
+| `babelOptions`  | object or null | `null`  | An object containing Babel options or a flag to use default Babel settings.                  |
+
+## BabelOptions
+
+The `babelOptions` parameter can have the following properties:
+
+| Property   | Type    | Default | Description                                                                                   |
+| ---------- | ------- | ------- | --------------------------------------------------------------------------------------------- |
+| `useBabel` | boolean | `false` | If set to `true`, enables Babel transformation with default presets targeting ES2015.         |
+| `presets`  | array   | -       | Custom Babel presets to use for transformation. If provided, overrides the `useBabel` option. |
 
 ## Changelog
 

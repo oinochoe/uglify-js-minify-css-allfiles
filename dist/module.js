@@ -61,6 +61,33 @@ async function processFile(filePath, logger, babelOptions = null) {
 }
 
 /**
+ * Resolves Babel options based on the provided configuration.
+ *
+ * @param {Object|null} options - The Babel options object or null.
+ * @returns {Object|null} The resolved Babel options or null if no valid options are provided.
+ */
+function resolveBabelOptions(options) {
+    if (!options) return null;
+
+    if (options.useBabel) {
+        return {
+            presets: [
+                [
+                    '@babel/preset-env',
+                    {
+                        targets: {
+                            esmodules: false, // Target ES2015
+                        },
+                    },
+                ],
+            ],
+        };
+    }
+
+    return options.presets ? options : null;
+}
+
+/**
  * Minifies all JavaScript and CSS files in the specified directory and its subdirectories.
  *
  * @async
@@ -101,10 +128,11 @@ export default async function minifyAll(contentPath, excludeFolder = '', babelOp
     await logger.initialize();
 
     const rootDir = contentPath || '';
+    const finalBabelOptions = resolveBabelOptions(babelOptions);
 
     await getAllFiles(rootDir, async (filePath) => {
         if (excludeFolder && filePath.includes(excludeFolder)) return;
-        await processFile(filePath, logger, babelOptions);
+        await processFile(filePath, logger, finalBabelOptions);
     });
 
     await logger.summarize();
