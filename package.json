@@ -4,6 +4,9 @@
     "description": "you will be able to minify all files as same file names which is js or css",
     "main": "minify.js",
     "type": "module",
+    "exports": {
+        ".": "./minify.js"
+    },
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1"
     },
@@ -43,9 +46,7 @@
     "dependencies": {
         "clean-css": "^4.2.4",
         "uglify-js": "^3.19.2",
-        "uglify-js-es6": "^2.8.9"
-    },
-    "devDependencies": {
+        "uglify-js-es6": "^2.8.9",
         "@babel/core": "^7.25.2",
         "@babel/preset-env": "^7.25.3"
     }
