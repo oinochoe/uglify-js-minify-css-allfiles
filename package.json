@@ -1,6 +1,6 @@
 {
-    "name": "@oinochoe/uglify-js-minify-css-allfiles",
-    "version": "2.1.0",
+    "name": "uglify-js-minify-css-allfiles",
+    "version": "2.1.1",
     "description": "you will be able to minify all files as same file names which is js or css",
     "main": "minify.js",
     "type": "module",
@@ -16,7 +16,7 @@
         "url": "git+https://github.com/oinochoe/uglify-js-minify-css-allfiles.git"
     },
     "publishConfig": {
-        "registry": "https://npm.pkg.github.com/"
+        "registry": "https://registry.npmjs.org/"
     },
     "keywords": [
         "ugly-code",
