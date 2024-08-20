@@ -13,31 +13,31 @@ import { minifyJS, minifyCSS } from './modules/minifier.js';
 import babelCore from '@babel/core';
 
 const FILE_HANDLERS = {
-    '.js': async (filePath, content, logger, babelOptions) => {
-        try {
-            // Transform the code using Babel with preset-env
-            let transformed = content;
+  '.js': async (filePath, content, logger, babelOptions) => {
+    try {
+      // Transform the code using Babel with preset-env
+      let transformed = content;
 
-            // Convert code to Babel when Babel option is provided
-            if (babelOptions) {
-                transformed = babelCore.transformSync(content, babelOptions).code;
-            }
+      // Convert code to Babel when Babel option is provided
+      if (babelOptions) {
+        transformed = babelCore.transformSync(content, babelOptions).code;
+      }
 
-            const result = minifyJS(transformed);
-            await writeFile(filePath, result, logger);
-        } catch (error) {
-            await logger.logError(filePath, `Babel transformation failed: ${error.message}`);
-        }
-    },
-    '.css': async (filePath, content, logger) => {
-        const output = await minifyCSS(content);
-        if (output.warnings.length > 0) {
-            await logger.logError(filePath, `CSS warnings: ${output.warnings.join(', ')}`);
-            await writeFile(filePath, null, logger);
-        } else {
-            await writeFile(filePath, output.styles, logger);
-        }
-    },
+      const result = minifyJS(transformed);
+      await writeFile(filePath, result, logger);
+    } catch (error) {
+      await logger.logError(filePath, `Babel transformation failed: ${error.message}`);
+    }
+  },
+  '.css': async (filePath, content, logger) => {
+    const output = await minifyCSS(content);
+    if (output.warnings.length > 0) {
+      await logger.logError(filePath, `CSS warnings: ${output.warnings.join(', ')}`);
+      await writeFile(filePath, null, logger);
+    } else {
+      await writeFile(filePath, output.styles, logger);
+    }
+  },
 };
 
 /**
@@ -49,15 +49,15 @@ const FILE_HANDLERS = {
  * @returns {Promise<void>}
  */
 async function processFile(filePath, logger, babelOptions = null) {
-    const fileContent = await fs.readFile(filePath, 'utf-8');
-    const fileExtension = path.extname(filePath);
-    const handler = FILE_HANDLERS[fileExtension];
+  const fileContent = await fs.readFile(filePath, 'utf-8');
+  const fileExtension = path.extname(filePath);
+  const handler = FILE_HANDLERS[fileExtension];
 
-    if (handler) {
-        await handler(filePath, fileContent, logger, babelOptions);
-    } else {
-        logger.logInfo(`지원되지 않는 파일 형식 건너뜀: ${filePath}`);
-    }
+  if (handler) {
+    await handler(filePath, fileContent, logger, babelOptions);
+  } else {
+    logger.logInfo(`지원되지 않는 파일 형식 건너뜀: ${filePath}`);
+  }
 }
 
 /**
@@ -67,24 +67,24 @@ async function processFile(filePath, logger, babelOptions = null) {
  * @returns {Object|null} The resolved Babel options or null if no valid options are provided.
  */
 function resolveBabelOptions(options) {
-    if (!options) return null;
+  if (!options) return null;
 
-    if (options.useBabel) {
-        return {
-            presets: [
-                [
-                    '@babel/preset-env',
-                    {
-                        targets: {
-                            esmodules: false, // Target ES2015
-                        },
-                    },
-                ],
-            ],
-        };
-    }
+  if (options.useBabel) {
+    return {
+      presets: [
+        [
+          '@babel/preset-env',
+          {
+            targets: {
+              esmodules: false, // Target ES2015
+            },
+          },
+        ],
+      ],
+    };
+  }
 
-    return options.presets ? options : null;
+  return options.presets ? options : null;
 }
 
 /**
@@ -124,16 +124,16 @@ function resolveBabelOptions(options) {
  * });
  */
 export default async function minifyAll(contentPath, excludeFolder = '', babelOptions = null) {
-    const logger = new Logger();
-    await logger.initialize();
+  const logger = new Logger();
+  await logger.initialize();
 
-    const rootDir = contentPath || '';
-    const finalBabelOptions = resolveBabelOptions(babelOptions);
+  const rootDir = contentPath || '';
+  const finalBabelOptions = resolveBabelOptions(babelOptions);
 
-    await getAllFiles(rootDir, async (filePath) => {
-        if (excludeFolder && filePath.includes(excludeFolder)) return;
-        await processFile(filePath, logger, finalBabelOptions);
-    });
+  await getAllFiles(rootDir, async (filePath) => {
+    if (excludeFolder && filePath.includes(excludeFolder)) return;
+    await processFile(filePath, logger, finalBabelOptions);
+  });
 
-    await logger.summarize();
+  await logger.summarize();
 }

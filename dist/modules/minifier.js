@@ -11,7 +11,7 @@ import CleanCSS from 'clean-css';
  * @constant {Object}
  */
 const CSS_OPTIONS = {
-    level: { 1: { all: false } },
+  level: { 1: { all: false } },
 };
 
 /**
@@ -21,11 +21,11 @@ const CSS_OPTIONS = {
  * @returns {string} The minified JavaScript content.
  */
 export function minifyJS(content) {
-    return uglifyJS(content, {
-        compress: {
-            pure_funcs: ['console.log', 'console.error', 'console.warn', 'console.info'],
-        },
-    }).code;
+  return uglifyJS(content, {
+    compress: {
+      pure_funcs: ['console.log', 'console.error', 'console.warn', 'console.info'],
+    },
+  }).code;
 }
 
 /**
@@ -36,7 +36,7 @@ export function minifyJS(content) {
  * @returns {Promise<Object>} A promise that resolves to the minification result.
  */
 export function minifyCSS(content) {
-    return new Promise((resolve) => {
-        new CleanCSS(CSS_OPTIONS).minify(content, (error, output) => resolve(output));
-    });
+  return new Promise((resolve) => {
+    new CleanCSS(CSS_OPTIONS).minify(content, (error, output) => resolve(output));
+  });
 }

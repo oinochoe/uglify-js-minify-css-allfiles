@@ -23,12 +23,12 @@ You can easily minify all files in a specific folder, with the option to exclude
 
 ## Table of Contents
 
--   [Installation](#installation)
--   [Usage](#usage)
--   [Parameters](#parameters)
--   [BabelOptions](#babeloptions)
--   [Changelog](#changelog)
--   [License](#license)
+- [Installation](#installation)
+- [Usage](#usage)
+- [Parameters](#parameters)
+- [BabelOptions](#babeloptions)
+- [Changelog](#changelog)
+- [License](#license)
 
 ## Installation
 
@@ -42,38 +42,38 @@ $ npm i uglify-js-minify-css-allfiles
 
 1. Basic usage (no Babel):
 
-    ```js
-    import minifyAll from 'uglify-js-minify-css-allfiles';
+   ```js
+   import minifyAll from 'uglify-js-minify-css-allfiles';
 
-    await minifyAll('./src/', 'node_modules');
-    ```
+   await minifyAll('./src/', 'node_modules');
+   ```
 
 2. Using Babel with default settings:
 
-    ```js
-    import minifyAll from 'uglify-js-minify-css-allfiles';
+   ```js
+   import minifyAll from 'uglify-js-minify-css-allfiles';
 
-    await minifyAll('./src/', 'node_modules', { useBabel: true });
-    ```
+   await minifyAll('./src/', 'node_modules', { useBabel: true });
+   ```
 
 3. Using custom Babel presets:
 
-    ```js
-    import minifyAll from 'uglify-js-minify-css-allfiles';
+   ```js
+   import minifyAll from 'uglify-js-minify-css-allfiles';
 
-    await minifyAll('./src/', 'node_modules', {
-        presets: [
-            [
-                '@babel/preset-env',
-                {
-                    targets: {
-                        esmodules: false, // Target ES2015
-                    },
-                },
-            ],
-        ],
-    });
-    ```
+   await minifyAll('./src/', 'node_modules', {
+     presets: [
+       [
+         '@babel/preset-env',
+         {
+           targets: {
+             esmodules: false, // Target ES2015
+           },
+         },
+       ],
+     ],
+   });
+   ```
 
 ## Parameters
 

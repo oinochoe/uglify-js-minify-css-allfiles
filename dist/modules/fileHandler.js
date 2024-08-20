@@ -15,16 +15,16 @@ import path from 'path';
  * @returns {Promise<void>}
  */
 export async function getAllFiles(dirPath, callback) {
-    const files = await fs.readdir(dirPath);
-    for (const file of files) {
-        const filePath = path.join(dirPath, file);
-        const fileStat = await fs.stat(filePath);
-        if (fileStat.isFile()) {
-            await callback(filePath, fileStat);
-        } else if (fileStat.isDirectory()) {
-            await getAllFiles(filePath, callback);
-        }
+  const files = await fs.readdir(dirPath);
+  for (const file of files) {
+    const filePath = path.join(dirPath, file);
+    const fileStat = await fs.stat(filePath);
+    if (fileStat.isFile()) {
+      await callback(filePath, fileStat);
+    } else if (fileStat.isDirectory()) {
+      await getAllFiles(filePath, callback);
     }
+  }
 }
 
 /**
@@ -37,15 +37,15 @@ export async function getAllFiles(dirPath, callback) {
  * @returns {Promise<void>}
  */
 export async function writeFile(filePath, content, logger) {
-    if (typeof content === 'undefined' || content === '' || content === null) {
-        await logger.logError(filePath, 'Invalid or empty content');
-        return;
-    }
+  if (typeof content === 'undefined' || content === '' || content === null) {
+    await logger.logError(filePath, 'Invalid or empty content');
+    return;
+  }
 
-    logger.logInfo(`Writing file: ${filePath}`);
-    try {
-        await fs.writeFile(filePath, content, 'utf-8');
-    } catch (error) {
-        await logger.logError(filePath, `Write failed: ${error.message}`);
-    }
+  logger.logInfo(`Writing file: ${filePath}`);
+  try {
+    await fs.writeFile(filePath, content, 'utf-8');
+  } catch (error) {
+    await logger.logError(filePath, `Write failed: ${error.message}`);
+  }
 }
