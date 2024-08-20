@@ -1,7 +1,6 @@
 /**
  * uglify-js and minify-css for all files
  * Released under the terms of MIT license
- *
  * Copyright (C) 2024 yeongmin
  */
 
@@ -15,27 +14,25 @@ import babelCore from '@babel/core';
 const FILE_HANDLERS = {
   '.js': async (filePath, content, logger, babelOptions) => {
     try {
-      // Transform the code using Babel with preset-env
       let transformed = content;
-
-      // Convert code to Babel when Babel option is provided
       if (babelOptions) {
         transformed = babelCore.transformSync(content, babelOptions).code;
       }
-
       const result = minifyJS(transformed);
       await writeFile(filePath, result, logger);
     } catch (error) {
-      await logger.logError(filePath, `Babel transformation failed: ${error.message}`);
+      await logger?.error('JavaScript minification failed', { filePath, error: error.message });
     }
   },
   '.css': async (filePath, content, logger) => {
-    const output = await minifyCSS(content);
-    if (output.warnings.length > 0) {
-      await logger.logError(filePath, `CSS warnings: ${output.warnings.join(', ')}`);
-      await writeFile(filePath, null, logger);
-    } else {
+    try {
+      const output = await minifyCSS(content);
+      if (0 < output.warnings.length) {
+        await logger?.warn('CSS minification warnings', { filePath, warnings: output.warnings });
+      }
       await writeFile(filePath, output.styles, logger);
+    } catch (error) {
+      await logger?.error('CSS minification failed', { filePath, error: error.message });
     }
   },
 };
@@ -49,43 +46,72 @@ const FILE_HANDLERS = {
  * @returns {Promise<void>}
  */
 async function processFile(filePath, logger, babelOptions = null) {
-  const fileContent = await fs.readFile(filePath, 'utf-8');
-  const fileExtension = path.extname(filePath);
-  const handler = FILE_HANDLERS[fileExtension];
+  try {
+    const fileContent = await fs.readFile(filePath, 'utf-8');
+    const fileExtension = path.extname(filePath).toLowerCase();
+    const handler = FILE_HANDLERS[fileExtension];
 
-  if (handler) {
-    await handler(filePath, fileContent, logger, babelOptions);
-  } else {
-    logger.logInfo(`지원되지 않는 파일 형식 건너뜀: ${filePath}`);
+    if (handler) {
+      await handler(filePath, fileContent, logger, babelOptions);
+    } else {
+      await logger?.info(`Unsupported file type, skipping: ${filePath}`);
+    }
+  } catch (error) {
+    await logger?.error('Error processing file', { filePath, error: error.message });
   }
 }
 
 /**
  * Resolves Babel options based on the provided configuration.
  *
- * @param {Object|null} options - The Babel options object or null.
+ * @param {Object|null} useBabel - The Babel options object or null.
  * @returns {Object|null} The resolved Babel options or null if no valid options are provided.
  */
-function resolveBabelOptions(options) {
-  if (!options) return null;
-
-  if (options.useBabel) {
-    return {
-      presets: [
-        [
-          '@babel/preset-env',
-          {
-            targets: {
-              esmodules: false, // Target ES2015
-            },
-          },
-        ],
-      ],
-    };
-  }
-
-  return options.presets ? options : null;
+function resolveBabelOptions(useBabel) {
+  if (!useBabel) return null;
+  return {
+    presets: [['@babel/preset-env', typeof useBabel === 'object' ? useBabel : {}]],
+  };
 }
+
+/**
+ * Options for Babel configuration.
+ *
+ * @typedef {Object} BabelOptions
+ * @property {string|string[]|Object<string, string>} [targets] - Specifies the target environments for the code.
+ * @property {'amd'|'umd'|'systemjs'|'commonjs'|'cjs'|'auto'|false} [modules] - Module format to use for the output.
+ * @property {boolean} [debug] - Enables or disables debug mode.
+ * @property {string[]} [include] - List of plugins or features to include.
+ * @property {string[]} [exclude] - List of plugins or features to exclude.
+ * @property {'usage'|'entry'|false} [useBuiltIns] - Determines how polyfills are added.
+ * @property {2|3|{version: 2|3, proposals: boolean}} [corejs] - Specifies the version of core-js to use and whether to include proposals.
+ * @property {boolean} [forceAllTransforms] - Forces the application of all transformations.
+ * @property {string} [configPath] - Path to the configuration file.
+ * @property {boolean} [ignoreBrowserslistConfig] - Ignores the browserslist configuration.
+ * @property {boolean} [shippedProposals] - Enables support for shipped proposals.
+ */
+
+/**
+ * Options for logging configuration.
+ *
+ * @typedef {Object} LogOptions
+ * @property {string} [logDir] - Specifies the directory for log files.
+ * @property {number} [retentionDays] - Number of days to retain log files.
+ * @property {string} [logLevel] - Specifies the level of logging (e.g., 'info', 'warn', 'error').
+ * @property {string} [dateFormat] - Format for the date in log entries.
+ * @property {string} [timeZone] - Time zone for timestamps in log entries.
+ * @property {boolean} [logToConsole] - Determines if logs should also be output to the console.
+ * @property {boolean} [logToFile] - Determines if logs should be written to a file.
+ */
+
+/**
+ * Options for minification configuration.
+ *
+ * @typedef {Object} MinifyOptions
+ * @property {string} [excludeFolder] - Folder to exclude from minification.
+ * @property {boolean|BabelOptions} [useBabel] - Whether to use Babel for transformation, and the options for Babel if used.
+ * @property {boolean|LogOptions} [useLog] - Whether to use logging, and the options for logging if used.
+ */
 
 /**
  * Minifies all JavaScript and CSS files in the specified directory and its subdirectories.
@@ -93,47 +119,38 @@ function resolveBabelOptions(options) {
  * @async
  * @function minifyAll
  * @param {string} contentPath - The path to the directory containing the files to be minified.
- * @param {string} [excludeFolder=''] - The name of a folder to exclude from minification.
- * @param {Object} [babelOptions=null] - Babel options for converting JavaScript files.
+ * @param {MinifyOptions} [options={}] - Options for minification, Babel, and logging.
  * @returns {Promise<void>} A promise that resolves when all files have been processed.
  * @throws {Error} If there's an issue reading or writing files.
- *
- * @example
- * // Minify all files in './test/' directory, excluding 'lib' folder
- * import minifyAll from './main.js';
- * await minifyAll('./test/', 'lib');
- *
- * @example
- * // Minify all files in a directory specified as a command line argument
- * import minifyAll from './main.js';
- * await minifyAll(process.argv[2], process.argv[3]);
- *
- * @example
- * // Add babel options for converting JavaScript files.
- * minifyAll('./test/', 'lib', {
- *     presets: [
- *         [
- *             '@babel/preset-env',
- *             {
- *                 targets: {
- *                     esmodules: false, // Target ES2015
- *                 },
- *             },
- *         ],
- *     ],
- * });
  */
-export default async function minifyAll(contentPath, excludeFolder = '', babelOptions = null) {
-  const logger = new Logger();
-  await logger.initialize();
+export default async function minifyAll(contentPath, options = {}) {
+  const { excludeFolder = '', useBabel = false, useLog = true, logOptions = {} } = options;
 
-  const rootDir = contentPath || '';
-  const finalBabelOptions = resolveBabelOptions(babelOptions);
+  const logger = useLog ? new Logger(logOptions) : null;
 
-  await getAllFiles(rootDir, async (filePath) => {
-    if (excludeFolder && filePath.includes(excludeFolder)) return;
-    await processFile(filePath, logger, finalBabelOptions);
-  });
+  if (logger) {
+    await logger.initialize();
+    await logger.info('Starting minification process', { contentPath, excludeFolder, useBabel });
+  }
 
-  await logger.summarize();
+  const rootDir = path.resolve(contentPath || '');
+  const finalBabelOptions = resolveBabelOptions(useBabel);
+
+  try {
+    await getAllFiles(rootDir, async (filePath) => {
+      if (excludeFolder && path.relative(rootDir, filePath).startsWith(excludeFolder)) {
+        await logger?.debug('Skipping excluded file', { filePath });
+        return;
+      }
+
+      await processFile(filePath, logger, finalBabelOptions);
+      logger?.incrementProcessedFiles(filePath);
+    });
+  } catch (error) {
+    await logger?.error('Error in minification process', { error: error.message });
+  }
+
+  if (logger) {
+    await logger.summarize();
+  }
 }

@@ -5,13 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.0] - 2024-08-20
+
+### Changed
+
+- Logging Enhancements:
+  Structured Log Levels: Implemented a new logging system with defined log levels (e.g., info, warn, error) to improve log readability and management.
+  Date-based Log Files: Logs are now stored in files organized by date, making it easier to track and analyze logs over time.
+- Type Generation:
+  Introduced a new type generation feature to improve type safety and consistency across the application.
+
 ## [2.0.0] - 2024-08-19
 
 ### Added
 
-- New logging system for better error tracking and debugging
-- Optional Babel integration for advanced JavaScript transpilation
-- Support for ES modules, allowing use of `import` statements in your projects
+- See Breaking Changes
 
 ### Changed
 
@@ -30,6 +38,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Minimum Node.js version requirement increased to v14.0.0
 - Configuration file format changed (see migration guide for details)
 - Some CLI options have been renamed for clarity (see documentation for new option names)
+- Support for ES modules, allowing use of `import` statements in your projects
+- New logging system for better error tracking and debugging
+- Optional Babel integration for advanced JavaScript transpilation
 
 ## [1.3.2] - 2023-05-28
 
@@ -77,6 +88,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - New `exceptFolder` parameter to exclude specific folders from minification
 - Support for using relative paths
 
+[2.1.0]: https://github.com/oinochoe/uglify-js-minify-css-allfiles/compare/v2.0.0...v2.1.0
 [2.0.0]: https://github.com/oinochoe/uglify-js-minify-css-allfiles/compare/v1.3.2...v2.0.0
 [1.3.2]: https://github.com/oinochoe/uglify-js-minify-css-allfiles/compare/v1.3.1...v1.3.2
 [1.3.1]: https://github.com/oinochoe/uglify-js-minify-css-allfiles/compare/v1.3.0...v1.3.1

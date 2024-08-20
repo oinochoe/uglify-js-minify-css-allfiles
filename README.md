@@ -26,7 +26,7 @@ You can easily minify all files in a specific folder, with the option to exclude
 - [Installation](#installation)
 - [Usage](#usage)
 - [Parameters](#parameters)
-- [BabelOptions](#babeloptions)
+- [Options](#options)
 - [Changelog](#changelog)
 - [License](#license)
 
@@ -45,33 +45,50 @@ $ npm i uglify-js-minify-css-allfiles
    ```js
    import minifyAll from 'uglify-js-minify-css-allfiles';
 
-   await minifyAll('./src/', 'node_modules');
+   await minifyAll('./src/');
    ```
 
-2. Using Babel with default settings:
+2. Using options:
 
    ```js
    import minifyAll from 'uglify-js-minify-css-allfiles';
 
-   await minifyAll('./src/', 'node_modules', { useBabel: true });
+   await minifyAll('./src/', {
+     excludeFolder: 'node_modules',
+     useBabel: {
+       targets: 'chrome 40',
+       modules: false,
+       useBuiltIns: 'usage',
+       corejs: 3,
+     },
+     useLog: {
+       logDir: 'logs',
+       retentionDays: 30,
+       logLevel: 'info',
+       dateFormat: 'YYYY-MM-DD',
+       timeZone: 'UTC',
+       logToConsole: true,
+       logToFile: true,
+     },
+   });
    ```
 
-3. Using custom Babel presets:
+3. Using Babel and custom logging options:
 
    ```js
    import minifyAll from 'uglify-js-minify-css-allfiles';
 
-   await minifyAll('./src/', 'node_modules', {
-     presets: [
-       [
-         '@babel/preset-env',
-         {
-           targets: {
-             esmodules: false, // Target ES2015
-           },
-         },
-       ],
-     ],
+   await minifyAll('./src/', {
+     useBabel: { targets: 'chrome 40' },
+     useLog: {
+       logDir: 'logs',
+       retentionDays: 30,
+       logLevel: 'info',
+       dateFormat: 'YYYY-MM-DD',
+       timeZone: 'UTC',
+       logToConsole: true,
+       logToFile: true,
+     },
    });
    ```
 
@@ -79,20 +96,46 @@ $ npm i uglify-js-minify-css-allfiles
 
 The `minifyAll` function accepts the following parameters:
 
-| Parameter       | Type           | Default | Description                                                                                  |
-| --------------- | -------------- | ------- | -------------------------------------------------------------------------------------------- |
-| `contentPath`   | string         | -       | The path to the directory containing the files to be minified. This is a required parameter. |
-| `excludeFolder` | string         | `''`    | The name of a folder to exclude from minification. Leave empty to include all folders.       |
-| `babelOptions`  | object or null | `null`  | An object containing Babel options or a flag to use default Babel settings.                  |
+| Parameter     | Type   | Default | Description                                                                                  |
+| ------------- | ------ | ------- | -------------------------------------------------------------------------------------------- |
+| `contentPath` | string | -       | The path to the directory containing the files to be minified. This is a required parameter. |
+| `options`     | object | `{}`    | An object containing options for minification, Babel, and logging.                           |
 
-## BabelOptions
+## Options
 
-The `babelOptions` parameter can have the following properties:
+The `options` object can have the following properties:
 
-| Property   | Type    | Default | Description                                                                                   |
-| ---------- | ------- | ------- | --------------------------------------------------------------------------------------------- |
-| `useBabel` | boolean | `false` | If set to `true`, enables Babel transformation with default presets targeting ES2015.         |
-| `presets`  | array   | -       | Custom Babel presets to use for transformation. If provided, overrides the `useBabel` option. |
+| Property        | Type              | Default | Description                                                                                |
+| --------------- | ----------------- | ------- | ------------------------------------------------------------------------------------------ |
+| `excludeFolder` | string            | `''`    | The name of a folder to exclude from minification.                                         |
+| `useBabel`      | boolean \| object | `false` | If `true`, enables Babel with default settings. If an object, specifies Babel options.     |
+| `useLog`        | boolean \| object | `true`  | If `true`, enables logging with default settings. If an object, specifies logging options. |
+
+### Babel Options
+
+When `useBabel` is an object, it can have the following properties:
+
+| Property                              | Type                        | Description                                                                                               |
+| ------------------------------------- | --------------------------- | --------------------------------------------------------------------------------------------------------- |
+| `targets`                             | string \| object            | Specifies the target environments.                                                                        |
+| `modules`                             | string \| false             | Enables transformation of ES6 module syntax to another module type.                                       |
+| `useBuiltIns`                         | 'usage' \| 'entry' \| false | Configures how babel-preset-env handles polyfills.                                                        |
+| `corejs`                              | number \| object            | Specifies the core-js version.                                                                            |
+| ... (other @babel/preset-env options) | Various                     | Refer to [@babel/preset-env documentation](https://babeljs.io/docs/en/babel-preset-env) for more options. |
+
+### Log Options
+
+When `useLog` is an object, it can have the following properties:
+
+| Property        | Type    | Default        | Description                                                           |
+| --------------- | ------- | -------------- | --------------------------------------------------------------------- |
+| `logDir`        | string  | `'logs'`       | Specifies the directory for log files.                                |
+| `retentionDays` | number  | 30             | Number of days to retain log files.                                   |
+| `logLevel`      | string  | `'info'`       | Specifies the level of logging (e.g., `'info'`, `'warn'`, `'error'`). |
+| `dateFormat`    | string  | `'YYYY-MM-DD'` | Format for the date in log entries.                                   |
+| `timeZone`      | string  | `'UTC'`        | Time zone for timestamps in log entries.                              |
+| `logToConsole`  | boolean | `true`         | Determines if logs should also be output to the console.              |
+| `logToFile`     | boolean | `true`         | Determines if logs should be written to a file.                       |
 
 ## Changelog
 

@@ -1,9 +1,10 @@
 {
     "name": "@oinochoe/uglify-js-minify-css-allfiles",
-    "version": "2.0.4",
+    "version": "2.1.0",
     "description": "you will be able to minify all files as same file names which is js or css",
     "main": "minify.js",
     "type": "module",
+    "types": "minify.d.ts",
     "exports": {
         ".": "./minify.js"
     },

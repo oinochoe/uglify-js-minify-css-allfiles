@@ -38,14 +38,14 @@ export async function getAllFiles(dirPath, callback) {
  */
 export async function writeFile(filePath, content, logger) {
   if (typeof content === 'undefined' || content === '' || content === null) {
-    await logger.logError(filePath, 'Invalid or empty content');
+    await logger?.error('Invalid or empty content', { filePath });
     return;
   }
 
-  logger.logInfo(`Writing file: ${filePath}`);
+  await logger?.info(`Writing file: ${filePath}`);
   try {
     await fs.writeFile(filePath, content, 'utf-8');
   } catch (error) {
-    await logger.logError(filePath, `Write failed: ${error.message}`);
+    await logger?.error(`Write failed: ${error.message}`, { filePath });
   }
 }
