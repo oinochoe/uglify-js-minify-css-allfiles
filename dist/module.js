@@ -11,22 +11,48 @@ import { getAllFiles, writeFile } from './modules/fileHandler.js';
 import { minifyJS, minifyCSS } from './modules/minifier.js';
 import babelCore from '@babel/core';
 
+/**
+ * Object containing handlers for different file types.
+ * @type {Object.<string, function>}
+ */
 const FILE_HANDLERS = {
-  '.js': async (filePath, content, logger, babelOptions) => {
+  /**
+   * Handles JavaScript file minification.
+   * @async
+   * @param {string} filePath - The path of the JavaScript file.
+   * @param {string} content - The content of the JavaScript file.
+   * @param {Logger} logger - The logger instance.
+   * @param {Object} options - Options for processing.
+   * @param {Object} [options.babelOptions] - Babel transformation options.
+   * @param {Object} [options.jsMinifyOptions] - JavaScript minification options.
+   * @returns {Promise<void>}
+   */
+  '.js': async (filePath, content, logger, options) => {
     try {
       let transformed = content;
-      if (babelOptions) {
-        transformed = babelCore.transformSync(content, babelOptions).code;
+      if (options.babelOptions) {
+        transformed = babelCore.transformSync(content, options.babelOptions).code;
       }
-      const result = minifyJS(transformed);
+      const result = minifyJS(transformed, options.jsMinifyOptions);
       await writeFile(filePath, result, logger);
     } catch (error) {
       await logger?.error('JavaScript minification failed', { filePath, error: error.message });
     }
   },
-  '.css': async (filePath, content, logger) => {
+
+  /**
+   * Handles CSS file minification.
+   * @async
+   * @param {string} filePath - The path of the CSS file.
+   * @param {string} content - The content of the CSS file.
+   * @param {Logger} logger - The logger instance.
+   * @param {Object} options - Options for processing.
+   * @param {Object} [options.cssMinifyOptions] - CSS minification options.
+   * @returns {Promise<void>}
+   */
+  '.css': async (filePath, content, logger, options) => {
     try {
-      const output = await minifyCSS(content);
+      const output = await minifyCSS(content, options.cssMinifyOptions);
       if (0 < output.warnings.length) {
         await logger?.warn('CSS minification warnings', { filePath, warnings: output.warnings });
       }
@@ -42,17 +68,17 @@ const FILE_HANDLERS = {
  * @async
  * @param {string} filePath - The path of the file to process.
  * @param {Logger} logger - The logger instance.
- * @param {Object} [babelOptions=null] - Babel options for converting JavaScript files.
+ * @param {Object} options - Options for processing.
  * @returns {Promise<void>}
  */
-async function processFile(filePath, logger, babelOptions = null) {
+async function processFile(filePath, logger, options) {
   try {
     const fileContent = await fs.readFile(filePath, 'utf-8');
     const fileExtension = path.extname(filePath).toLowerCase();
     const handler = FILE_HANDLERS[fileExtension];
 
     if (handler) {
-      await handler(filePath, fileContent, logger, babelOptions);
+      await handler(filePath, fileContent, logger, options);
     } else {
       await logger?.info(`Unsupported file type, skipping: ${filePath}`);
     }
@@ -63,8 +89,7 @@ async function processFile(filePath, logger, babelOptions = null) {
 
 /**
  * Resolves Babel options based on the provided configuration.
- *
- * @param {Object|null} useBabel - The Babel options object or null.
+ * @param {boolean|Object} useBabel - The Babel options object or boolean.
  * @returns {Object|null} The resolved Babel options or null if no valid options are provided.
  */
 function resolveBabelOptions(useBabel) {
@@ -106,11 +131,12 @@ function resolveBabelOptions(useBabel) {
 
 /**
  * Options for minification configuration.
- *
  * @typedef {Object} MinifyOptions
- * @property {string} [excludeFolder] - Folder to exclude from minification.
- * @property {boolean|BabelOptions} [useBabel] - Whether to use Babel for transformation, and the options for Babel if used.
- * @property {boolean|LogOptions} [useLog] - Whether to use logging, and the options for logging if used.
+ * @property {string} [excludeFolder=''] - Folder to exclude from minification.
+ * @property {boolean|Object} [useBabel=false] - Whether to use Babel for transformation, and the options for Babel if used.
+ * @property {boolean|Object} [useLog=true] - Whether to use logging, and the options for logging if used.
+ * @property {Object} [jsMinifyOptions={}] - Options for JavaScript minification.
+ * @property {Object} [cssMinifyOptions={}] - Options for CSS minification.
  */
 
 /**
@@ -124,17 +150,30 @@ function resolveBabelOptions(useBabel) {
  * @throws {Error} If there's an issue reading or writing files.
  */
 export default async function minifyAll(contentPath, options = {}) {
-  const { excludeFolder = '', useBabel = false, useLog = true, logOptions = {} } = options;
+  const {
+    excludeFolder = '',
+    useBabel = false,
+    useLog = true,
+    jsMinifyOptions = {},
+    cssMinifyOptions = {},
+  } = options;
 
-  const logger = useLog ? new Logger(logOptions) : null;
-
-  if (logger) {
+  let logger = null;
+  if (useLog) {
+    const logOptions = typeof useLog === 'object' ? useLog : {};
+    logger = new Logger(logOptions);
     await logger.initialize();
     await logger.info('Starting minification process', { contentPath, excludeFolder, useBabel });
   }
 
   const rootDir = path.resolve(contentPath || '');
-  const finalBabelOptions = resolveBabelOptions(useBabel);
+  const babelOptions = resolveBabelOptions(useBabel);
+
+  const processOptions = {
+    babelOptions,
+    jsMinifyOptions,
+    cssMinifyOptions,
+  };
 
   try {
     await getAllFiles(rootDir, async (filePath) => {
@@ -143,7 +182,7 @@ export default async function minifyAll(contentPath, options = {}) {
         return;
       }
 
-      await processFile(filePath, logger, finalBabelOptions);
+      await processFile(filePath, logger, processOptions);
       logger?.incrementProcessedFiles(filePath);
     });
   } catch (error) {

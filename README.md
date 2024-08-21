@@ -27,6 +27,7 @@ You can easily minify all files in a specific folder, with the option to exclude
 - [Usage](#usage)
 - [Parameters](#parameters)
 - [Options](#options)
+- [Minification Options](#minification-options)
 - [Changelog](#changelog)
 - [License](#license)
 
@@ -70,24 +71,27 @@ $ npm i uglify-js-minify-css-allfiles
        logToConsole: true,
        logToFile: true,
      },
-   });
-   ```
-
-3. Using Babel and custom logging options:
-
-   ```js
-   import minifyAll from 'uglify-js-minify-css-allfiles';
-
-   await minifyAll('./src/', {
-     useBabel: { targets: 'chrome 40' },
-     useLog: {
-       logDir: 'logs',
-       retentionDays: 30,
-       logLevel: 'info',
-       dateFormat: 'YYYY-MM-DD',
-       timeZone: 'UTC',
-       logToConsole: true,
-       logToFile: true,
+     jsMinifyOptions: {
+       compress: {
+         dead_code: true,
+         drop_debugger: true,
+         conditionals: true,
+         evaluate: true,
+         booleans: true,
+         loops: true,
+         unused: true,
+         hoist_funs: true,
+         keep_fargs: false,
+         hoist_vars: true,
+         if_return: true,
+         join_vars: true,
+         cascade: true,
+         side_effects: true,
+         warnings: false,
+       },
+     },
+     cssMinifyOptions: {
+       level: 2,
      },
    });
    ```
@@ -105,11 +109,13 @@ The `minifyAll` function accepts the following parameters:
 
 The `options` object can have the following properties:
 
-| Property        | Type              | Default | Description                                                                                |
-| --------------- | ----------------- | ------- | ------------------------------------------------------------------------------------------ |
-| `excludeFolder` | string            | `''`    | The name of a folder to exclude from minification.                                         |
-| `useBabel`      | boolean \| object | `false` | If `true`, enables Babel with default settings. If an object, specifies Babel options.     |
-| `useLog`        | boolean \| object | `true`  | If `true`, enables logging with default settings. If an object, specifies logging options. |
+| Property           | Type              | Default | Description                                                                                |
+| ------------------ | ----------------- | ------- | ------------------------------------------------------------------------------------------ |
+| `excludeFolder`    | string            | `''`    | The name of a folder to exclude from minification.                                         |
+| `useBabel`         | boolean \| object | `false` | If `true`, enables Babel with default settings. If an object, specifies Babel options.     |
+| `useLog`           | boolean \| object | `true`  | If `true`, enables logging with default settings. If an object, specifies logging options. |
+| `jsMinifyOptions`  | object            | `{}`    | Options for JavaScript minification (passed to UglifyJS).                                  |
+| `cssMinifyOptions` | object            | `{}`    | Options for CSS minification (passed to CleanCSS).                                         |
 
 ### Babel Options
 
@@ -136,6 +142,28 @@ When `useLog` is an object, it can have the following properties:
 | `timeZone`      | string  | `'UTC'`        | Time zone for timestamps in log entries.                              |
 | `logToConsole`  | boolean | `true`         | Determines if logs should also be output to the console.              |
 | `logToFile`     | boolean | `true`         | Determines if logs should be written to a file.                       |
+
+## Minification Options
+
+### JavaScript Minification Options
+
+The `jsMinifyOptions` object is passed directly to UglifyJS. For a full list of available options, please refer to the [UglifyJS documentation](https://github.com/mishoo/UglifyJS#minify-options).
+
+Some commonly used options include:
+
+- `compress`: An object specifying compression options.
+- `mangle`: Controls name mangling. Can be a boolean or an object with more specific options.
+- `output`: An object controlling the output format.
+
+### CSS Minification Options
+
+The `cssMinifyOptions` object is passed directly to Clean-CSS. For a full list of available options, please refer to the [Clean-CSS documentation](https://github.com/clean-css/clean-css#constructor-options).
+
+Some commonly used options include:
+
+- `level`: Optimization level (0, 1, or 2).
+- `compatibility`: Browser compatibility (e.g., 'ie7', '\*').
+- `format`: Output formatting options.
 
 ## Changelog
 

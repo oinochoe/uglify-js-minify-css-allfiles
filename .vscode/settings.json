@@ -1,13 +1,15 @@
 {
-    "cSpell.words": [
-        "allfile",
-        "allfiles",
-        "comporessor",
-        "corejs",
-        "esmodules",
-        "minifycss",
-        "oinochoe",
-        "uglifyjs",
-        "yeongmin"
-    ]
+  "cSpell.words": [
+    "allfile",
+    "allfiles",
+    "comporessor",
+    "corejs",
+    "esmodules",
+    "fargs",
+    "funs",
+    "minifycss",
+    "oinochoe",
+    "uglifyjs",
+    "yeongmin"
+  ]
 }
