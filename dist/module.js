@@ -9,7 +9,17 @@ import path from 'path';
 import Logger from './modules/logger.js';
 import { getAllFiles, writeFile } from './modules/fileHandler.js';
 import { minifyJS, minifyCSS } from './modules/minifier.js';
-import babelCore from '@babel/core';
+import { createRequire } from 'module';
+import { fileURLToPath, pathToFileURL } from 'url';
+
+const require = createRequire(import.meta.url);
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+function resolveModulePath(moduleName) {
+  const modulePath = require.resolve(moduleName, { paths: [__dirname] });
+  return pathToFileURL(modulePath).href;
+}
 
 /**
  * Object containing handlers for different file types.
@@ -31,7 +41,9 @@ const FILE_HANDLERS = {
     try {
       let transformed = content;
       if (options.babelOptions) {
-        transformed = babelCore.transformSync(content, options.babelOptions).code;
+        const babelCoreUrl = resolveModulePath('@babel/core');
+        const { transformSync } = await import(babelCoreUrl);
+        transformed = transformSync(content, options.babelOptions).code;
       }
       const result = minifyJS(transformed, options.jsMinifyOptions);
       await writeFile(filePath, result, logger);
@@ -177,7 +189,12 @@ export default async function minifyAll(contentPath, options = {}) {
 
   try {
     await getAllFiles(rootDir, async (filePath) => {
-      if (excludeFolder && path.relative(rootDir, filePath).startsWith(excludeFolder)) {
+      const relativePath = path.relative(rootDir, filePath);
+      if (
+        excludeFolder &&
+        (relativePath.startsWith(excludeFolder) ||
+          relativePath.includes(path.sep + excludeFolder + path.sep))
+      ) {
         await logger?.debug('Skipping excluded file', { filePath });
         return;
       }
