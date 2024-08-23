@@ -16,27 +16,37 @@ const require = createRequire(import.meta.url);
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+/**
+ * Resolves the path of a module.
+ * @param {string} moduleName - The name of the module to resolve.
+ * @returns {string} The resolved module path as a URL.
+ */
 function resolveModulePath(moduleName) {
   const modulePath = require.resolve(moduleName, { paths: [__dirname] });
   return pathToFileURL(modulePath).href;
 }
 
 /**
+ * @typedef {Object} FileHandlerOptions
+ * @property {BabelOptions} [babelOptions] - Babel transformation options.
+ * @property {JSMinifyOptions} [jsMinifyOptions] - JavaScript minification options.
+ * @property {CSSMinifyOptions} [cssMinifyOptions] - CSS minification options.
+ */
+
+/**
+ * @callback FileHandler
+ * @param {string} filePath - The path of the file to process.
+ * @param {string} content - The content of the file.
+ * @param {Logger} logger - The logger instance.
+ * @param {FileHandlerOptions} options - Options for processing.
+ * @returns {Promise<void>}
+ */
+
+/**
  * Object containing handlers for different file types.
- * @type {Object.<string, function>}
+ * @type {Object.<string, FileHandler>}
  */
 const FILE_HANDLERS = {
-  /**
-   * Handles JavaScript file minification.
-   * @async
-   * @param {string} filePath - The path of the JavaScript file.
-   * @param {string} content - The content of the JavaScript file.
-   * @param {Logger} logger - The logger instance.
-   * @param {Object} options - Options for processing.
-   * @param {Object} [options.babelOptions] - Babel transformation options.
-   * @param {Object} [options.jsMinifyOptions] - JavaScript minification options.
-   * @returns {Promise<void>}
-   */
   '.js': async (filePath, content, logger, options) => {
     try {
       let transformed = content;
@@ -51,17 +61,6 @@ const FILE_HANDLERS = {
       await logger?.error('JavaScript minification failed', { filePath, error: error.message });
     }
   },
-
-  /**
-   * Handles CSS file minification.
-   * @async
-   * @param {string} filePath - The path of the CSS file.
-   * @param {string} content - The content of the CSS file.
-   * @param {Logger} logger - The logger instance.
-   * @param {Object} options - Options for processing.
-   * @param {Object} [options.cssMinifyOptions] - CSS minification options.
-   * @returns {Promise<void>}
-   */
   '.css': async (filePath, content, logger, options) => {
     try {
       const output = await minifyCSS(content, options.cssMinifyOptions);
@@ -80,7 +79,7 @@ const FILE_HANDLERS = {
  * @async
  * @param {string} filePath - The path of the file to process.
  * @param {Logger} logger - The logger instance.
- * @param {Object} options - Options for processing.
+ * @param {FileHandlerOptions} options - Options for processing.
  * @returns {Promise<void>}
  */
 async function processFile(filePath, logger, options) {
@@ -101,8 +100,8 @@ async function processFile(filePath, logger, options) {
 
 /**
  * Resolves Babel options based on the provided configuration.
- * @param {boolean|Object} useBabel - The Babel options object or boolean.
- * @returns {Object|null} The resolved Babel options or null if no valid options are provided.
+ * @param {boolean|BabelOptions} useBabel - The Babel options object or boolean.
+ * @returns {BabelOptions|null} The resolved Babel options or null if no valid options are provided.
  */
 function resolveBabelOptions(useBabel) {
   if (!useBabel) return null;
@@ -113,9 +112,8 @@ function resolveBabelOptions(useBabel) {
 
 /**
  * Options for Babel configuration.
- *
  * @typedef {Object} BabelOptions
- * @property {string|string[]|Object<string, string>} [targets] - Specifies the target environments for the code.
+ * @property {string|string[]|Object.<string, string>} [targets] - Specifies the target environments for the code.
  * @property {'amd'|'umd'|'systemjs'|'commonjs'|'cjs'|'auto'|false} [modules] - Module format to use for the output.
  * @property {boolean} [debug] - Enables or disables debug mode.
  * @property {string[]} [include] - List of plugins or features to include.
@@ -130,7 +128,6 @@ function resolveBabelOptions(useBabel) {
 
 /**
  * Options for logging configuration.
- *
  * @typedef {Object} LogOptions
  * @property {string} [logDir] - Specifies the directory for log files.
  * @property {number} [retentionDays] - Number of days to retain log files.
@@ -142,20 +139,34 @@ function resolveBabelOptions(useBabel) {
  */
 
 /**
+ * Options for JavaScript minification (UglifyJS options).
+ * @typedef {Object} JSMinifyOptions
+ * @property {Object} [compress] - Compression options.
+ * @property {boolean|Object} [mangle] - Mangling options.
+ * @property {Object} [output] - Output format options.
+ */
+
+/**
+ * Options for CSS minification (Clean-CSS options).
+ * @typedef {Object} CSSMinifyOptions
+ * @property {0|1|2|Object} [level] - Optimization level.
+ * @property {string|string[]} [compatibility] - Browser compatibility options.
+ * @property {string|Object} [format] - Output formatting options.
+ */
+
+/**
  * Options for minification configuration.
  * @typedef {Object} MinifyOptions
  * @property {string} [excludeFolder=''] - Folder to exclude from minification.
- * @property {boolean|Object} [useBabel=false] - Whether to use Babel for transformation, and the options for Babel if used.
- * @property {boolean|Object} [useLog=true] - Whether to use logging, and the options for logging if used.
- * @property {Object} [jsMinifyOptions={}] - Options for JavaScript minification.
- * @property {Object} [cssMinifyOptions={}] - Options for CSS minification.
+ * @property {boolean|BabelOptions} [useBabel=false] - Whether to use Babel for transformation, and the options for Babel if used.
+ * @property {boolean|LogOptions} [useLog=true] - Whether to use logging, and the options for logging if used.
+ * @property {JSMinifyOptions} [jsMinifyOptions={}] - Options for JavaScript minification.
+ * @property {CSSMinifyOptions} [cssMinifyOptions={}] - Options for CSS minification.
  */
 
 /**
  * Minifies all JavaScript and CSS files in the specified directory and its subdirectories.
  *
- * @async
- * @function minifyAll
  * @param {string} contentPath - The path to the directory containing the files to be minified.
  * @param {MinifyOptions} [options={}] - Options for minification, Babel, and logging.
  * @returns {Promise<void>} A promise that resolves when all files have been processed.

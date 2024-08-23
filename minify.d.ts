@@ -106,6 +106,43 @@ declare module 'uglify-js-minify-css-allfiles' {
   }
 
   /**
+   * Configuration options for JavaScript minification (UglifyJS options).
+   */
+  export interface JSMinifyOptions {
+    compress?: {
+      dead_code?: boolean;
+      drop_debugger?: boolean;
+      conditionals?: boolean;
+      evaluate?: boolean;
+      booleans?: boolean;
+      loops?: boolean;
+      unused?: boolean;
+      hoist_funs?: boolean;
+      keep_fargs?: boolean;
+      hoist_vars?: boolean;
+      if_return?: boolean;
+      join_vars?: boolean;
+      cascade?: boolean;
+      side_effects?: boolean;
+      warnings?: boolean;
+      [key: string]: any;
+    };
+    mangle?: boolean | object;
+    output?: object;
+    [key: string]: any;
+  }
+
+  /**
+   * Configuration options for CSS minification (Clean-CSS options).
+   */
+  export interface CSSMinifyOptions {
+    level?: 0 | 1 | 2 | { [key: string]: any };
+    compatibility?: string | string[];
+    format?: string | object;
+    [key: string]: any;
+  }
+
+  /**
    * Configuration options for the minifyAll function.
    */
   export interface MinifyOptions {
@@ -131,6 +168,18 @@ declare module 'uglify-js-minify-css-allfiles' {
      * @default true
      */
     useLog?: boolean | LogOptions;
+
+    /**
+     * Options for JavaScript minification (passed to UglifyJS).
+     * @default {}
+     */
+    jsMinifyOptions?: JSMinifyOptions;
+
+    /**
+     * Options for CSS minification (passed to CleanCSS).
+     * @default {}
+     */
+    cssMinifyOptions?: CSSMinifyOptions;
   }
 
   /**
