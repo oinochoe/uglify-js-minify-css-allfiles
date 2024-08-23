@@ -101,13 +101,22 @@ async function processFile(filePath, logger, options) {
 /**
  * Resolves Babel options based on the provided configuration.
  * @param {boolean|BabelOptions} useBabel - The Babel options object or boolean.
- * @returns {BabelOptions|null} The resolved Babel options or null if no valid options are provided.
+ * @returns {Promise<BabelOptions|null>} A promise that resolves to the Babel options or null if no valid options are provided.
  */
-function resolveBabelOptions(useBabel) {
+async function resolveBabelOptions(useBabel) {
   if (!useBabel) return null;
-  return {
-    presets: [['@babel/preset-env', typeof useBabel === 'object' ? useBabel : {}]],
-  };
+
+  try {
+    const presetEnvUrl = resolveModulePath('@babel/preset-env');
+    const presetEnv = await import(presetEnvUrl);
+
+    return {
+      presets: [[presetEnv.default, typeof useBabel === 'object' ? useBabel : {}]],
+    };
+  } catch (error) {
+    console.error('Error loading @babel/preset-env:', error);
+    return null;
+  }
 }
 
 /**
@@ -190,7 +199,7 @@ export default async function minifyAll(contentPath, options = {}) {
   }
 
   const rootDir = path.resolve(contentPath || '');
-  const babelOptions = resolveBabelOptions(useBabel);
+  const babelOptions = await resolveBabelOptions(useBabel);
 
   const processOptions = {
     babelOptions,

@@ -5,6 +5,25 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.2.4] - 2024-08-23
+
+### Changed
+
+- Updated `resolveBabelOptions` function to dynamically import `@babel/preset-env` using `resolveModulePath`
+- Modified `minifyAll` function to handle the new asynchronous `resolveBabelOptions`
+
+### Improved
+
+- Enhanced flexibility in loading Babel presets, allowing for better compatibility with different environments
+
+## [2.2.3] - 2024-08-23
+
+### Improved
+
+- Enhanced type definitions using JSDoc comments for better IDE support and code documentation
+- Added more specific type definitions for JSMinifyOptions and CSSMinifyOptions
+- Improved type annotations for function parameters and return types
+
 ## [2.2.2] - 2024-08-22
 
 ### Fixed
