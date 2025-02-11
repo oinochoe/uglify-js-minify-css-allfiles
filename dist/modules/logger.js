@@ -1,5 +1,5 @@
 import fs from 'fs/promises';
-import path from 'path';
+import { joinPaths } from './pathResolver.js';
 
 class Logger {
   static LOG_LEVELS = {
@@ -131,7 +131,7 @@ class Logger {
   }
 
   getLogFilePath() {
-    return path.join(this.logDir, `log-${this.currentDate}.log`);
+    return joinPaths(this.logDir, `log-${this.currentDate}.log`);
   }
 
   getCurrentDate() {
@@ -152,7 +152,7 @@ class Logger {
         const files = await fs.readdir(this.logDir);
         const now = new Date();
         for (const file of files) {
-          const filePath = path.join(this.logDir, file);
+          const filePath = joinPaths(this.logDir, file);
           const stats = await fs.stat(filePath);
           const diffDays = (now - stats.mtime) / (1000 * 60 * 60 * 24);
           if (diffDays > this.retentionDays) {
