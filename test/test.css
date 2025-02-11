@@ -1,8 +1,73 @@
-.dragon {
-  width: 30px;
-  height: 50px;
+/* Basic url() cases */
+.basic-url {
+  background-image: url('img/sample.jpg');
 }
-.dragon a {
-  display: block;
-  margin: 30px;
+
+.no-quotes {
+  background: url(img/sample.jpg);
+}
+
+.double-quotes {
+  background-image: url('img/sample.png');
+}
+
+/* Multiple images on same line */
+.multiple-images {
+  background: url(img/sample.png), url('img/sample.jpg'), url('img/sample.gif');
+}
+
+/* image-set() cases */
+.image-set {
+  background-image: image-set(
+    'img/sample.avif' type('image/avif'),
+    'img/sample.webp' type('image/webp'),
+    'img/sample.jpg' type('image/jpeg')
+  );
+}
+
+/* Paths with query strings (should be skipped) */
+.existing-version {
+  background-image: url('img/sample.jpg?v=123');
+}
+
+/* Data URIs (should be skipped) */
+.data-uri {
+  background-image: url('data:image/svg+xml;base64,ABC123');
+}
+
+/* Different image formats */
+.formats {
+  background: url(test.png); /* PNG */
+  mask-image: url(icon.svg); /* SVG */
+  border-image: url(border.webp); /* WebP */
+  content: url(photo.avif); /* AVIF */
+}
+
+/* Complex cases */
+.complex {
+  /* Multiple properties */
+  background: transparent url('bg.jpg') no-repeat center;
+
+  /* With color */
+  background: #fff url('pattern.png') repeat-x;
+
+  /* With dimensions */
+  background: url(sprite.png) -50px -100px no-repeat;
+}
+
+/* Edge cases */
+.edge-cases {
+  /* URL with parentheses */
+  background: url('img/sample(1).jpg');
+
+  /* URL with spaces */
+  background: url('img/sample photo.png');
+
+  /* URL with special characters */
+  background: url('img/sample-#1.jpg');
+
+  /* Relative paths */
+  background: url('../img/sample.jpg');
+  background: url('./img/sample.jpg');
+  background: url('/img/sample.njpg');
 }

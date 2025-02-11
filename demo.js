@@ -5,4 +5,7 @@ minifyAll('./test/', {
   useBabel: {
     targets: 'chrome 40',
   },
+  useVersioning: {
+    extensions: ['.png', '.jpg', '.webp', '.avif', '.svg'],
+  },
 });

@@ -2,106 +2,160 @@
  * uglify-js and minify-css for all files
  * Released under the terms of MIT license
  * Copyright (C) 2024 yeongmin
+ * @module module
  */
 
 import { promises as fs } from 'fs';
-import path from 'path';
+import crypto from 'crypto';
 import Logger from './modules/logger.js';
-import { getAllFiles, writeFile } from './modules/fileHandler.js';
+import { getAllFiles, writeFile, shouldVersionFile } from './modules/fileHandler.js';
+import HashManager from './modules/hashManager.js';
 import { minifyJS, minifyCSS } from './modules/minifier.js';
-import { createRequire } from 'module';
-import { fileURLToPath, pathToFileURL } from 'url';
-
-const require = createRequire(import.meta.url);
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+import { DEFAULT_IMAGE_EXTENSIONS, IMAGE_PATTERNS } from './modules/imageUtils.js';
+import {
+  resolveImagePath,
+  resolveModulePath,
+  makeRelativePath,
+  containsFolder,
+  getExtension,
+  resolvePath,
+} from './modules/pathResolver.js';
 
 /**
- * Resolves the path of a module.
- * @param {string} moduleName - The name of the module to resolve.
- * @returns {string} The resolved module path as a URL.
+ * Processes image references in files and adds/updates version hashes for cache busting.
+ * Handles both JavaScript and CSS files differently:
+ * - For JS files: Generates a random hash
+ * - For CSS files: Generates a content-based hash
+ *
+ * @async
+ * @param {RegExp} pattern - Regular expression pattern to match image references
+ * @param {string} content - Content of the file being processed
+ * @param {string} fileExt - File extension (e.g., '.js', '.css')
+ * @param {string} filePath - Absolute path to the file being processed
+ * @param {Logger} logger - Logger instance for tracking changes
+ * @param {HashManager} hashManager - Manages content-based hashing for images
+ * @param {string[]} targetExtensions - List of image extensions to process (e.g., ['.png', '.jpg'])
+ * @returns {Promise<{content: string, modified: boolean}>} Modified content and whether changes were made
  */
-function resolveModulePath(moduleName) {
-  const modulePath = require.resolve(moduleName, { paths: [__dirname] });
-  return pathToFileURL(modulePath).href;
+async function processPattern(pattern, content, fileExt, filePath, logger, hashManager, targetExtensions) {
+  const promises = [];
+  let newContent = content;
+  let modified = false;
+
+  newContent = content.replace(pattern, (match, imagePath, _ext, queryString) => {
+    if (imagePath.startsWith('data:')) {
+      return match;
+    }
+
+    const absoluteImagePath = resolveImagePath(imagePath, filePath);
+    if (!absoluteImagePath || !shouldVersionFile(absoluteImagePath, targetExtensions)) {
+      return match;
+    }
+
+    if (fileExt === '.js') {
+      const randomBytes = crypto.randomBytes(16);
+      const newHash = randomBytes.toString('hex').substring(0, 8);
+      const versionedPath = `${imagePath}?v=${newHash}`;
+      modified = true;
+
+      promises.push(
+        logger?.info('Updated JS image reference with hash', {
+          file: filePath,
+          image: imagePath,
+          newHash,
+        }),
+      );
+
+      return match.replace(imagePath + (queryString || ''), versionedPath);
+    }
+
+    if (fileExt === '.css') {
+      const marker = `__HASH_MARKER_${promises.length}__`;
+      promises.push({ marker, imagePath, absoluteImagePath });
+      return match.replace(imagePath + (queryString || ''), `${imagePath}?v=${marker}`);
+    }
+
+    return match;
+  });
+
+  if (fileExt === '.css' && promises.length > 0) {
+    for (let i = 0; i < promises.length; i++) {
+      const { marker, imagePath, absoluteImagePath } = promises[i];
+      const { hash, changed } = await hashManager.generateHash(absoluteImagePath);
+
+      if (!hash) {
+        newContent = newContent.replace(`${imagePath}?v=${marker}`, imagePath);
+        await logger?.warn('Failed to generate hash, keeping original URL', {
+          file: filePath,
+          image: imagePath,
+        });
+        continue;
+      }
+
+      if (changed) {
+        modified = true;
+        await logger?.info('Updated CSS image version', {
+          file: filePath,
+          image: imagePath,
+          oldHash: hashManager.getPreviousHash(absoluteImagePath),
+          newHash: hash,
+        });
+      }
+
+      newContent = newContent.replace(`?v=${marker}`, `?v=${hash}`);
+    }
+  }
+
+  await Promise.all(promises.filter((p) => p instanceof Promise));
+  return { content: newContent, modified };
 }
 
 /**
- * @typedef {Object} FileHandlerOptions
- * @property {BabelOptions} [babelOptions] - Babel transformation options.
- * @property {JSMinifyOptions} [jsMinifyOptions] - JavaScript minification options.
- * @property {CSSMinifyOptions} [cssMinifyOptions] - CSS minification options.
- */
-
-/**
- * @callback FileHandler
- * @param {string} filePath - The path of the file to process.
- * @param {string} content - The content of the file.
- * @param {Logger} logger - The logger instance.
- * @param {FileHandlerOptions} options - Options for processing.
- * @returns {Promise<void>}
- */
-
-/**
- * Object containing handlers for different file types.
- * @type {Object.<string, FileHandler>}
- */
-const FILE_HANDLERS = {
-  '.js': async (filePath, content, logger, options) => {
-    try {
-      let transformed = content;
-      if (options.babelOptions) {
-        const babelCoreUrl = resolveModulePath('@babel/core');
-        const { transformSync } = await import(babelCoreUrl);
-        transformed = transformSync(content, options.babelOptions).code;
-      }
-      const result = minifyJS(transformed, options.jsMinifyOptions);
-      await writeFile(filePath, result, logger);
-    } catch (error) {
-      await logger?.error('JavaScript minification failed', { filePath, error: error.message });
-    }
-  },
-  '.css': async (filePath, content, logger, options) => {
-    try {
-      const output = await minifyCSS(content, options.cssMinifyOptions);
-      if (0 < output.warnings.length) {
-        await logger?.warn('CSS minification warnings', { filePath, warnings: output.warnings });
-      }
-      await writeFile(filePath, output.styles, logger);
-    } catch (error) {
-      await logger?.error('CSS minification failed', { filePath, error: error.message });
-    }
-  },
-};
-
-/**
- * Processes a single file based on its extension.
+ * Updates image references in a file with version query strings.
  * @async
- * @param {string} filePath - The path of the file to process.
- * @param {Logger} logger - The logger instance.
- * @param {FileHandlerOptions} options - Options for processing.
+ * @param {string} filePath - Path to the file to process.
+ * @param {Object} versioningOptions - Options for versioning.
+ * @param {string[]} [versioningOptions.extensions] - List of file extensions to version.
+ * @param {Logger} logger - Logger instance.
+ * @param {HashManager} hashManager - Hash manager instance.
  * @returns {Promise<void>}
  */
-async function processFile(filePath, logger, options) {
-  try {
-    const fileContent = await fs.readFile(filePath, 'utf-8');
-    const fileExtension = path.extname(filePath).toLowerCase();
-    const handler = FILE_HANDLERS[fileExtension];
+async function updateImageReferences(filePath, versioningOptions, logger, hashManager) {
+  const { extensions } = versioningOptions;
+  const targetExtensions =
+    extensions || DEFAULT_IMAGE_EXTENSIONS.map((ext) => (ext === 'jpe?g' ? ['.jpg', '.jpeg'] : ['.' + ext.replace('?', '')])).flat();
 
-    if (handler) {
-      await handler(filePath, fileContent, logger, options);
-    } else {
-      await logger?.info(`Unsupported file type, skipping: ${filePath}`);
+  const fileExt = getExtension(filePath);
+  const patterns = IMAGE_PATTERNS[fileExt.substring(1)] || [];
+
+  try {
+    let content = await fs.readFile(filePath, 'utf-8');
+    let modified = false;
+
+    for (const pattern of patterns) {
+      const result = await processPattern(pattern, content, fileExt, filePath, logger, hashManager, targetExtensions);
+      content = result.content;
+      modified = modified || result.modified;
+    }
+
+    if (modified) {
+      await fs.writeFile(filePath, content, 'utf-8');
+      await logger?.info('Updated file with versioned image references', {
+        file: filePath,
+      });
     }
   } catch (error) {
-    await logger?.error('Error processing file', { filePath, error: error.message });
+    await logger?.error('Failed to process file', {
+      file: filePath,
+      error: error.message,
+    });
   }
 }
 
 /**
  * Resolves Babel options based on the provided configuration.
  * @param {boolean|BabelOptions} useBabel - The Babel options object or boolean.
- * @returns {Promise<BabelOptions|null>} A promise that resolves to the Babel options or null if no valid options are provided.
+ * @returns {Promise<BabelOptions|null>} - A promise that resolves to the Babel options or null if disabled.
  */
 async function resolveBabelOptions(useBabel) {
   if (!useBabel) return null;
@@ -116,6 +170,48 @@ async function resolveBabelOptions(useBabel) {
   } catch (error) {
     console.error('Error loading @babel/preset-env:', error);
     return null;
+  }
+}
+
+/**
+ * Processes a single file based on its extension.
+ * @async
+ * @param {string} filePath - The path of the file to process.
+ * @param {Logger} logger - The logger instance.
+ * @param {Object} options - Processing options.
+ * @param {BabelOptions} [options.babelOptions] - Babel transformation options.
+ * @param {Object} [options.jsMinifyOptions] - JavaScript minification options.
+ * @param {Object} [options.cssMinifyOptions] - CSS minification options.
+ * @returns {Promise<void>}
+ */
+async function processFile(filePath, logger, options) {
+  try {
+    const fileContent = await fs.readFile(filePath, 'utf-8');
+    const fileExtension = getExtension(filePath);
+
+    let result;
+    if (fileExtension === '.js') {
+      let transformed = fileContent;
+      if (options.babelOptions) {
+        const babelCoreUrl = resolveModulePath('@babel/core');
+        const { transformSync } = await import(babelCoreUrl);
+        transformed = transformSync(fileContent, options.babelOptions).code;
+      }
+      result = minifyJS(transformed, options.jsMinifyOptions);
+    } else if (fileExtension === '.css') {
+      const output = await minifyCSS(fileContent, options.cssMinifyOptions);
+      if (output.warnings.length > 0) {
+        await logger?.warn('CSS minification warnings', { filePath, warnings: output.warnings });
+      }
+      result = output.styles;
+    } else {
+      await logger?.info(`Unsupported file type, skipping: ${filePath}`);
+      return;
+    }
+
+    await writeFile(filePath, result, logger);
+  } catch (error) {
+    await logger?.error('Error processing file', { filePath, error: error.message });
   }
 }
 
@@ -167,18 +263,19 @@ async function resolveBabelOptions(useBabel) {
  * Options for minification configuration.
  * @typedef {Object} MinifyOptions
  * @property {string} [excludeFolder=''] - Folder to exclude from minification.
- * @property {boolean|BabelOptions} [useBabel=false] - Whether to use Babel for transformation, and the options for Babel if used.
- * @property {boolean|LogOptions} [useLog=true] - Whether to use logging, and the options for logging if used.
+ * @property {boolean|BabelOptions} [useBabel=false] - Whether to use Babel for transformation.
+ * @property {boolean|LogOptions} [useLog=true] - Whether to use logging.
  * @property {JSMinifyOptions} [jsMinifyOptions={}] - Options for JavaScript minification.
  * @property {CSSMinifyOptions} [cssMinifyOptions={}] - Options for CSS minification.
+ * @property {string[]|null} [useVersioning=null] - Options for file versioning.
  */
 
 /**
- * Minifies all JavaScript and CSS files in the specified directory and its subdirectories.
- *
- * @param {string} contentPath - The path to the directory containing the files to be minified.
- * @param {MinifyOptions} [options={}] - Options for minification, Babel, and logging.
- * @returns {Promise<void>} A promise that resolves when all files have been processed.
+ * Main function to minify all files and handle versioning.
+ * @async
+ * @param {string} contentPath - The path to process files from.
+ * @param {MinifyOptions} [options={}] - Configuration options.
+ * @returns {Promise<void>} - A promise that resolves when all files have been processed.
  * @throws {Error} If there's an issue reading or writing files.
  */
 export default async function minifyAll(contentPath, options = {}) {
@@ -188,6 +285,7 @@ export default async function minifyAll(contentPath, options = {}) {
     useLog = true,
     jsMinifyOptions = {},
     cssMinifyOptions = {},
+    useVersioning = null,
   } = options;
 
   let logger = null;
@@ -195,11 +293,21 @@ export default async function minifyAll(contentPath, options = {}) {
     const logOptions = typeof useLog === 'object' ? useLog : {};
     logger = new Logger(logOptions);
     await logger.initialize();
-    await logger.info('Starting minification process', { contentPath, excludeFolder, useBabel });
+    await logger.info('Starting minification process', {
+      contentPath,
+      excludeFolder,
+      useBabel,
+      useVersioning: !!useVersioning,
+    });
   }
 
-  const rootDir = path.resolve(contentPath || '');
+  const rootDir = resolvePath(contentPath || '');
   const babelOptions = await resolveBabelOptions(useBabel);
+  const hashManager = useVersioning ? new HashManager(rootDir) : null;
+
+  if (hashManager) {
+    await hashManager.initialize();
+  }
 
   const processOptions = {
     babelOptions,
@@ -209,17 +317,19 @@ export default async function minifyAll(contentPath, options = {}) {
 
   try {
     await getAllFiles(rootDir, async (filePath) => {
-      const relativePath = path.relative(rootDir, filePath);
-      if (
-        excludeFolder &&
-        (relativePath.startsWith(excludeFolder) ||
-          relativePath.includes(path.sep + excludeFolder + path.sep))
-      ) {
+      const relativePath = makeRelativePath(filePath, rootDir);
+      if (excludeFolder && containsFolder(relativePath, excludeFolder)) {
         await logger?.debug('Skipping excluded file', { filePath });
         return;
       }
 
       await processFile(filePath, logger, processOptions);
+
+      // Apply versioning after successful processing if enabled
+      if (useVersioning && hashManager) {
+        await updateImageReferences(filePath, useVersioning, logger, hashManager);
+      }
+
       logger?.incrementProcessedFiles(filePath);
     });
   } catch (error) {

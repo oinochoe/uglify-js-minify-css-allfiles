@@ -9,6 +9,8 @@ class ModernBank {
   // Static private field
   static #bankName = 'Modern JS Bank';
 
+  static #imageTest = './img/sample.jpg';
+
   // Static public field
   static exchangeRate = 1.2;
 
@@ -30,12 +32,13 @@ class ModernBank {
   // Public method
   deposit(amount) {
     this.#balance += amount;
-    this.#addTransaction('Deposit', amount);
+    this.#addTransaction('Deposit', amount + './img/sample.jpg');
   }
 
   // Public method with optional chaining and nullish coalescing
   withdraw(amount, { fee, description } = {}) {
-    const totalAmount = amount + (fee ?? 0);
+    const url = './img/sample.jpg';
+    const totalAmount = amount + (fee ?? 0) + url;
     if (this.#balance >= totalAmount) {
       this.#balance -= totalAmount;
       this.#addTransaction(description?.trim() || 'Withdrawal', -amount);
