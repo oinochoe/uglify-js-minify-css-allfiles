@@ -87,10 +87,7 @@ export function joinPaths(...paths) {
  */
 export function containsFolder(filePath, folderName) {
   const normalizedPath = path.normalize(filePath);
-  return (
-    normalizedPath.includes(path.sep + folderName + path.sep) ||
-    normalizedPath.startsWith(folderName + path.sep)
-  );
+  return normalizedPath.includes(path.sep + folderName + path.sep) || normalizedPath.startsWith(folderName + path.sep);
 }
 
 /**

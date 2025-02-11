@@ -59,9 +59,7 @@ class Logger {
       this.logLevel = Logger.LOG_LEVELS[normalizedLevel];
       console.log(`Log level set to "${normalizedLevel}"`);
     } else {
-      console.warn(
-        `Invalid log level "${level}". Using default level "${Logger.DEFAULT_LOG_LEVEL}".`,
-      );
+      console.warn(`Invalid log level "${level}". Using default level "${Logger.DEFAULT_LOG_LEVEL}".`);
       this.logLevel = Logger.LOG_LEVELS[Logger.DEFAULT_LOG_LEVEL];
     }
   }
