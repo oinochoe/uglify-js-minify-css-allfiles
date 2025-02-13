@@ -75,10 +75,7 @@ async function processPattern(pattern, content, fileExt, filePath, logger, hashM
 
         if (!hash) {
           newContent = newContent.replace(`${imagePath}?v=${marker}`, imagePath);
-          await logger?.warn('Failed to generate hash, keeping original URL', {
-            file: filePath,
-            image: imagePath + ext,
-          });
+          // 'Failed to generate hash, keeping original URL : ' + filePath;
           continue;
         }
 
@@ -86,7 +83,7 @@ async function processPattern(pattern, content, fileExt, filePath, logger, hashM
           modified = true;
           await logger?.info('Updated CSS image version', {
             file: filePath,
-            image: imagePath + ext,
+            image: imagePath,
             oldHash: hashManager.getPreviousHash(absoluteImagePath),
             newHash: hash,
           });
@@ -197,7 +194,7 @@ async function processFile(filePath, logger, options) {
       }
       result = output.styles;
     } else {
-      await logger?.info(`Unsupported file type, skipping: ${filePath}`);
+      // `Unsupported file type, skipping: ${filePath}`;
       return;
     }
 

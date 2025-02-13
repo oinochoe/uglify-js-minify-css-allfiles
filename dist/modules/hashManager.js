@@ -88,7 +88,7 @@ export default class HashManager {
       try {
         await fs.access(filePath);
       } catch (error) {
-        console.warn(`File not found: ${filePath}`);
+        // `File not found: ${filePath}`;
         return { hash: null, changed: false };
       }
 
