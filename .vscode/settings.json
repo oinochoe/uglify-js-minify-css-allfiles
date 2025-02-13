@@ -6,10 +6,12 @@
     "corejs",
     "esmodules",
     "fargs",
+    "funcs",
     "funs",
     "minifycss",
     "oinochoe",
     "uglifyjs",
+    "webp",
     "yeongmin"
   ]
 }

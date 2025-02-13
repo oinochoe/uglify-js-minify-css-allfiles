@@ -1,35 +1,38 @@
-[![NPM downloads][npm-downloads]][npm-url]
-[![NPM total downloads][npm-total-downloads]][npm-url]
-
-| &nbsp;<br>[![Donate][donate-badge]][donate-url] <br>&nbsp; | Your help is appreciated! [Create a PR][create-pr] or just [buy me a coffee][donate-url] |
-| ---------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
-
-[npm-url]: https://www.npmjs.com/package/uglify-js-minify-css-allfiles
-[npm-downloads]: https://img.shields.io/npm/dm/uglify-js-minify-css-allfiles.svg
-[npm-total-downloads]: https://img.shields.io/npm/dt/uglify-js-minify-css-allfiles.svg?label=total+downloads
-[donate-badge]: https://img.shields.io/badge/Buy%20me%20a%20coffee-Donate-red.svg
-[donate-url]: https://github.com/sponsors/oinochoe
-[create-pr]: https://github.com/oinochoe/uglify-js-minify-css-allfiles/pulls
-
 # uglify-js-minify-css-allfiles
 
 A powerful tool to minify and obfuscate JavaScript and CSS files in your project.  
 It helps protect your code in deployment environments and makes it less recognizable to others, all through a simple CLI interface.  
 You can easily minify all files in a specific folder, with the option to exclude certain directories.
 
+[![NPM downloads][npm-downloads]][npm-url]
+[![NPM total downloads][npm-total-downloads]][npm-url]
 [![NPM](https://nodei.co/npm/uglify-js-minify-css-allfiles.png?downloads=true&stars=true)](https://www.npmjs.com/package/uglify-js-minify-css-allfiles)
-
----
 
 ## Table of Contents
 
 - [Installation](#installation)
+- [Features](#features)
 - [Usage](#usage)
 - [Parameters](#parameters)
 - [Options](#options)
+- [Advanced Features](#advanced-features)
+  - [Babel Integration](#babel-integration)
+  - [Image Versioning](#image-versioning)
+  - [Logging System](#logging-system)
+- [API Reference](#api-reference)
 - [Minification Options](#minification-options)
-- [Changelog](#changelog)
+- [Contributing](#contributing)
 - [License](#license)
+
+## Features
+
+- 🚀 JavaScript and CSS minification with advanced options
+- 📦 Babel transformation support for modern JavaScript
+- 🖼️ Automatic image versioning and cache busting
+- 📝 Comprehensive logging system
+- 🛡️ Configurable file exclusion
+- 🔄 ES module support
+- 📊 Processing statistics and summaries
 
 ## Installation
 
@@ -41,136 +44,220 @@ $ npm i uglify-js-minify-css-allfiles
 
 ## Usage
 
-1. Basic usage (no Babel):
+### Basic Usage
 
-   ```js
-   import minifyAll from 'uglify-js-minify-css-allfiles';
+```js
+import minifyAll from 'uglify-js-minify-css-allfiles';
 
-   await minifyAll('./src/');
-   ```
+await minifyAll('./src/');
+```
 
-2. Using options:
+### Advanced Usage
 
-   ```js
-   import minifyAll from 'uglify-js-minify-css-allfiles';
+```js
+import minifyAll from 'uglify-js-minify-css-allfiles';
 
-   await minifyAll('./src/', {
-     excludeFolder: 'node_modules',
-     useBabel: {
-       targets: 'chrome 40',
-       modules: false,
-       useBuiltIns: 'usage',
-       corejs: 3,
-     },
-     useLog: {
-       logDir: 'logs',
-       retentionDays: 30,
-       logLevel: 'info',
-       dateFormat: 'YYYY-MM-DD',
-       timeZone: 'UTC',
-       logToConsole: true,
-       logToFile: true,
-     },
-     jsMinifyOptions: {
-       compress: {
-         dead_code: true,
-         drop_debugger: true,
-         conditionals: true,
-         evaluate: true,
-         booleans: true,
-         loops: true,
-         unused: true,
-         hoist_funs: true,
-         keep_fargs: false,
-         hoist_vars: true,
-         if_return: true,
-         join_vars: true,
-         cascade: true,
-         side_effects: true,
-         warnings: false,
-       },
-     },
-     cssMinifyOptions: {
-       level: 2,
-     },
-   });
-   ```
+await minifyAll('./src/', {
+  excludeFolder: 'node_modules',
+  useBabel: {
+    targets: 'chrome 40',
+    modules: false,
+    useBuiltIns: 'usage',
+    corejs: 3,
+  },
+  useLog: {
+    logDir: 'logs',
+    retentionDays: 30,
+    logLevel: 'info',
+    dateFormat: 'YYYY-MM-DD',
+    timeZone: 'UTC',
+    logToConsole: true,
+    logToFile: true,
+  },
+  jsMinifyOptions: {
+    compress: {
+      dead_code: true,
+      drop_debugger: true,
+      pure_funcs: ['console.log'],
+      conditionals: true,
+      evaluate: true,
+      unused: true,
+    },
+    mangle: true,
+  },
+  cssMinifyOptions: {
+    level: 2,
+  },
+  useVersioning: {
+    extensions: ['.png', '.jpg', '.jpeg', '.gif', '.svg', '.webp'],
+  },
+});
+```
 
-## Parameters
+## Advanced Features
 
-The `minifyAll` function accepts the following parameters:
+### Babel Integration
 
-| Parameter     | Type   | Default | Description                                                                                  |
-| ------------- | ------ | ------- | -------------------------------------------------------------------------------------------- |
-| `contentPath` | string | -       | The path to the directory containing the files to be minified. This is a required parameter. |
-| `options`     | object | `{}`    | An object containing options for minification, Babel, and logging.                           |
+Built-in Babel support for modern JavaScript transpilation:
 
-## Options
+- Configurable target environments
+- Module transformation options
+- Built-ins and CoreJS integration
+- Customizable plugin/preset options
 
-The `options` object can have the following properties:
+```js
+await minifyAll('./src/', {
+  useBabel: {
+    targets: 'chrome 40',
+    modules: false,
+    useBuiltIns: 'usage',
+    corejs: 3,
+  },
+});
+```
 
-| Property           | Type              | Default | Description                                                                                |
-| ------------------ | ----------------- | ------- | ------------------------------------------------------------------------------------------ |
-| `excludeFolder`    | string            | `''`    | The name of a folder to exclude from minification.                                         |
-| `useBabel`         | boolean \| object | `false` | If `true`, enables Babel with default settings. If an object, specifies Babel options.     |
-| `useLog`           | boolean \| object | `true`  | If `true`, enables logging with default settings. If an object, specifies logging options. |
-| `jsMinifyOptions`  | object            | `{}`    | Options for JavaScript minification (passed to UglifyJS).                                  |
-| `cssMinifyOptions` | object            | `{}`    | Options for CSS minification (passed to CleanCSS).                                         |
+### Image Versioning
+
+Automatic versioning for image references in JS and CSS files:
+
+- Content-based hashing for images in CSS files
+- Random hash generation for JS image references
+- Support for multiple image formats (PNG, JPEG, GIF, SVG, WebP, etc.)
+- Handles various image path formats:
+  - Absolute and relative paths
+  - Data URIs
+  - HTTP/HTTPS URLs
+  - Complex CSS background declarations
+  - image-set() syntax support
+
+```js
+await minifyAll('./src/', {
+  useVersioning: {
+    extensions: ['.png', '.jpg', '.jpeg', '.gif', '.svg', '.webp'],
+  },
+});
+```
+
+### Logging System
+
+Comprehensive logging capabilities:
+
+- Multiple log levels (error, warn, info, debug)
+- File rotation with retention policies
+- Customizable date formats and timezones
+- Console and file output options
+- Processing statistics and summaries
+
+```js
+await minifyAll('./src/', {
+  useLog: {
+    logDir: 'logs',
+    retentionDays: 30,
+    logLevel: 'info',
+    dateFormat: 'YYYY-MM-DD',
+    timeZone: 'UTC',
+    logToConsole: true,
+    logToFile: true,
+  },
+});
+```
+
+## API Reference
+
+### minifyAll(contentPath, options)
+
+Main function to process files.
+
+- `contentPath` (string): Source directory path
+- `options` (object): Configuration options
+  - `excludeFolder` (string): Directory to exclude
+  - `useBabel` (boolean|object): Babel configuration
+  - `useLog` (boolean|object): Logging configuration
+  - `jsMinifyOptions` (object): JavaScript minification options
+  - `cssMinifyOptions` (object): CSS minification options
+  - `useVersioning` (object): Image versioning configuration
+    - `extensions` (string[]): List of image extensions to version
 
 ### Babel Options
 
-When `useBabel` is an object, it can have the following properties:
+The `useBabel` object supports all @babel/preset-env options:
 
-| Property                              | Type                        | Description                                                                                               |
-| ------------------------------------- | --------------------------- | --------------------------------------------------------------------------------------------------------- |
-| `targets`                             | string \| object            | Specifies the target environments.                                                                        |
-| `modules`                             | string \| false             | Enables transformation of ES6 module syntax to another module type.                                       |
-| `useBuiltIns`                         | 'usage' \| 'entry' \| false | Configures how babel-preset-env handles polyfills.                                                        |
-| `corejs`                              | number \| object            | Specifies the core-js version.                                                                            |
-| ... (other @babel/preset-env options) | Various                     | Refer to [@babel/preset-env documentation](https://babeljs.io/docs/en/babel-preset-env) for more options. |
-
-### Log Options
-
-When `useLog` is an object, it can have the following properties:
-
-| Property        | Type    | Default        | Description                                                           |
-| --------------- | ------- | -------------- | --------------------------------------------------------------------- |
-| `logDir`        | string  | `'logs'`       | Specifies the directory for log files.                                |
-| `retentionDays` | number  | 30             | Number of days to retain log files.                                   |
-| `logLevel`      | string  | `'info'`       | Specifies the level of logging (e.g., `'info'`, `'warn'`, `'error'`). |
-| `dateFormat`    | string  | `'YYYY-MM-DD'` | Format for the date in log entries.                                   |
-| `timeZone`      | string  | `'UTC'`        | Time zone for timestamps in log entries.                              |
-| `logToConsole`  | boolean | `true`         | Determines if logs should also be output to the console.              |
-| `logToFile`     | boolean | `true`         | Determines if logs should be written to a file.                       |
-
-## Minification Options
+```js
+{
+  targets: string | string[] | Object,
+  modules: 'amd' | 'umd' | 'systemjs' | 'commonjs' | false,
+  debug: boolean,
+  include: string[],
+  exclude: string[],
+  useBuiltIns: 'usage' | 'entry' | false,
+  corejs: 2 | 3 | { version: 2 | 3, proposals: boolean },
+  forceAllTransforms: boolean,
+  configPath: string,
+  ignoreBrowserslistConfig: boolean,
+  shippedProposals: boolean
+}
+```
 
 ### JavaScript Minification Options
 
-The `jsMinifyOptions` object is passed directly to UglifyJS. For a full list of available options, please refer to the [UglifyJS documentation](https://github.com/mishoo/UglifyJS#minify-options).
+Supports all UglifyJS options:
 
-Some commonly used options include:
-
-- `compress`: An object specifying compression options.
-- `mangle`: Controls name mangling. Can be a boolean or an object with more specific options.
-- `output`: An object controlling the output format.
+```js
+{
+  compress: {
+    dead_code: boolean,
+    drop_debugger: boolean,
+    pure_funcs: string[],
+    conditionals: boolean,
+    evaluate: boolean,
+    booleans: boolean,
+    loops: boolean,
+    unused: boolean,
+    if_return: boolean,
+    join_vars: boolean,
+    cascade: boolean,
+    side_effects: boolean
+  },
+  mangle: boolean | Object,
+  output: {
+    beautify: boolean,
+    comments: boolean | 'all' | 'some' | RegExp
+  }
+}
+```
 
 ### CSS Minification Options
 
-The `cssMinifyOptions` object is passed directly to Clean-CSS. For a full list of available options, please refer to the [Clean-CSS documentation](https://github.com/clean-css/clean-css#constructor-options).
+Supports Clean-CSS options:
 
-Some commonly used options include:
+```js
+{
+  level: 0 | 1 | 2 | {
+    1: {
+      all: boolean,
+      specialComments: boolean | string
+    },
+    2: {
+      mergeSemantically: boolean,
+      restructureRules: boolean
+    }
+  },
+  compatibility: string | string[],
+  format: string | Object
+}
+```
 
-- `level`: Optimization level (0, 1, or 2).
-- `compatibility`: Browser compatibility (e.g., 'ie7', '\*').
-- `format`: Output formatting options.
+## Contributing
 
-## Changelog
-
-See CHANGELOG.md for details on each release.
-
-[Changelog](/CHANGELOG.md)
+Your help is appreciated! [Create a PR][create-pr] or just [buy me a coffee][donate-url]
 
 ## License
 
 MIT. See [LICENSE.md](https://github.com/oinochoe/uglify-js-minify-css-allfiles/blob/master/LICENSE) for details.
+
+[npm-url]: https://www.npmjs.com/package/uglify-js-minify-css-allfiles
+[npm-downloads]: https://img.shields.io/npm/dm/uglify-js-minify-css-allfiles.svg
+[npm-total-downloads]: https://img.shields.io/npm/dt/uglify-js-minify-css-allfiles.svg?label=total+downloads
+[donate-badge]: https://img.shields.io/badge/Buy%20me%20a%20coffee-Donate-red.svg
+[donate-url]: https://github.com/sponsors/oinochoe
+[create-pr]: https://github.com/oinochoe/uglify-js-minify-css-allfiles/pulls

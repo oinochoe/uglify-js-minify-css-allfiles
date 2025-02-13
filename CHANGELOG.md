@@ -5,6 +5,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.3.0] - 2025-02-13
+
+### Added
+
+- Image versioning system with content-based hashing for cache busting
+  - Support for multiple image formats (PNG, JPEG, GIF, SVG, WebP, etc.)
+  - Automatic hash generation for images in CSS files
+  - Random hash generation for JS image references
+  - Support for various image path formats including absolute, relative, data URIs
+  - Complex CSS background and image-set() syntax support
+- New `useVersioning` option with configurable file extensions
+- Hash management system for tracking and updating image versions
+- Comprehensive image path resolution and processing utilities
+
+### Changed
+
+- Enhanced documentation with detailed image versioning examples and configuration options
+- Improved path resolution system to handle various image reference formats
+- Updated logging system to track image versioning operations
+
 ## [2.2.4] - 2024-08-23
 
 ### Changed
