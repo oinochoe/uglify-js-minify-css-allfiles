@@ -23,14 +23,8 @@ export const IMAGE_PATTERNS = {
     new RegExp(`(?:^|\\s|,)url\\(['"]?([^'"()\\s?#]+\\.(${IMAGE_EXT_PATTERN}))([?][^'"()\\s]*)?['"]?\\)`, 'gi'),
   ],
   js: [
-    // String literal pattern that handles query parameters separately
-    new RegExp(`=\\s*['"]([^'"()\\s?#]+\\.(${IMAGE_EXT_PATTERN}))([?][^'"()\\s]*)?['"]`, 'gi'),
-
-    // WeakMap/transformed pattern for private static fields
-    new RegExp(`[{]_:['"]([^'"()\\s?#]+\\.(${IMAGE_EXT_PATTERN}))([?][^'"()\\s]*)?['"][}]`, 'gi'),
-
-    // Import/require pattern
-    new RegExp(`(?:import|require)\\s*\\(?['"]([^'"?#]+\\.(${IMAGE_EXT_PATTERN}))([?][^'"()\\s]*)?['"]\\)?`, 'gi'),
+    // Basic extension-based pattern for all quotes
+    new RegExp(`(['"\`])([^'"\`]*?\\.(?:${IMAGE_EXT_PATTERN}))(['"\`])`, 'gi'),
   ],
 };
 

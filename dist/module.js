@@ -12,14 +12,7 @@ import { getAllFiles, writeFile, shouldVersionFile } from './modules/fileHandler
 import HashManager from './modules/hashManager.js';
 import { minifyJS, minifyCSS } from './modules/minifier.js';
 import { DEFAULT_IMAGE_EXTENSIONS, IMAGE_PATTERNS } from './modules/imageUtils.js';
-import {
-  resolveImagePath,
-  resolveModulePath,
-  makeRelativePath,
-  containsFolder,
-  getExtension,
-  resolvePath,
-} from './modules/pathResolver.js';
+import { resolveImagePath, resolveModulePath, makeRelativePath, containsFolder, getExtension, resolvePath } from './modules/pathResolver.js';
 
 /**
  * Processes image references in files and adds/updates version hashes for cache busting.
@@ -42,71 +35,70 @@ async function processPattern(pattern, content, fileExt, filePath, logger, hashM
   let newContent = content;
   let modified = false;
 
-  newContent = content.replace(pattern, (match, imagePath, _ext, queryString) => {
-    if (imagePath.startsWith('data:')) {
-      return match;
-    }
+  if (fileExt === '.js') {
+    const newHash = crypto.randomBytes(16).toString('hex').substring(0, 8);
 
-    const absoluteImagePath = resolveImagePath(imagePath, filePath);
-    if (!absoluteImagePath || !shouldVersionFile(absoluteImagePath, targetExtensions)) {
-      return match;
-    }
-
-    if (fileExt === '.js') {
-      const randomBytes = crypto.randomBytes(16);
-      const newHash = randomBytes.toString('hex').substring(0, 8);
-      const versionedPath = `${imagePath}?v=${newHash}`;
+    newContent = content.replace(pattern, (match, imagePath, ext, queryString) => {
+      if (imagePath.startsWith('data:') || imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
+        return match;
+      }
       modified = true;
+      logger?.info('Updated JS image version', {
+        file: filePath,
+        image: imagePath + ext,
+        newHash,
+      });
+      return `${imagePath}${ext}?v=${newHash}${queryString}`;
+    });
+    return { content: newContent, modified };
+  }
 
-      promises.push(
-        logger?.info('Updated JS image reference with hash', {
-          file: filePath,
-          image: imagePath,
-          newHash,
-        }),
-      );
+  if (fileExt === '.css') {
+    newContent = content.replace(pattern, (match, imagePath, _ext, queryString) => {
+      if (imagePath.startsWith('data:') || imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
+        return match;
+      }
 
-      return match.replace(imagePath + (queryString || ''), versionedPath);
-    }
+      const absoluteImagePath = resolveImagePath(imagePath, filePath);
+      if (!absoluteImagePath || !shouldVersionFile(absoluteImagePath, targetExtensions)) {
+        return match;
+      }
 
-    if (fileExt === '.css') {
       const marker = `__HASH_MARKER_${promises.length}__`;
       promises.push({ marker, imagePath, absoluteImagePath });
       return match.replace(imagePath + (queryString || ''), `${imagePath}?v=${marker}`);
+    });
+
+    if (promises.length > 0) {
+      for (const { marker, imagePath, absoluteImagePath } of promises) {
+        const { hash, changed } = await hashManager.generateHash(absoluteImagePath);
+
+        if (!hash) {
+          newContent = newContent.replace(`${imagePath}?v=${marker}`, imagePath);
+          await logger?.warn('Failed to generate hash, keeping original URL', {
+            file: filePath,
+            image: imagePath + ext,
+          });
+          continue;
+        }
+
+        if (changed) {
+          modified = true;
+          await logger?.info('Updated CSS image version', {
+            file: filePath,
+            image: imagePath + ext,
+            oldHash: hashManager.getPreviousHash(absoluteImagePath),
+            newHash: hash,
+          });
+        }
+
+        newContent = newContent.replace(`?v=${marker}`, `?v=${hash}`);
+      }
     }
 
-    return match;
-  });
-
-  if (fileExt === '.css' && promises.length > 0) {
-    for (let i = 0; i < promises.length; i++) {
-      const { marker, imagePath, absoluteImagePath } = promises[i];
-      const { hash, changed } = await hashManager.generateHash(absoluteImagePath);
-
-      if (!hash) {
-        newContent = newContent.replace(`${imagePath}?v=${marker}`, imagePath);
-        await logger?.warn('Failed to generate hash, keeping original URL', {
-          file: filePath,
-          image: imagePath,
-        });
-        continue;
-      }
-
-      if (changed) {
-        modified = true;
-        await logger?.info('Updated CSS image version', {
-          file: filePath,
-          image: imagePath,
-          oldHash: hashManager.getPreviousHash(absoluteImagePath),
-          newHash: hash,
-        });
-      }
-
-      newContent = newContent.replace(`?v=${marker}`, `?v=${hash}`);
-    }
+    await Promise.all(promises.filter((p) => p instanceof Promise));
   }
 
-  await Promise.all(promises.filter((p) => p instanceof Promise));
   return { content: newContent, modified };
 }
 
@@ -279,14 +271,7 @@ async function processFile(filePath, logger, options) {
  * @throws {Error} If there's an issue reading or writing files.
  */
 export default async function minifyAll(contentPath, options = {}) {
-  const {
-    excludeFolder = '',
-    useBabel = false,
-    useLog = true,
-    jsMinifyOptions = {},
-    cssMinifyOptions = {},
-    useVersioning = null,
-  } = options;
+  const { excludeFolder = '', useBabel = false, useLog = true, jsMinifyOptions = {}, cssMinifyOptions = {}, useVersioning = null } = options;
 
   let logger = null;
   if (useLog) {
