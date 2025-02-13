@@ -8,7 +8,7 @@
 }
 
 .double-quotes {
-  background-image: url('img/sample.png');
+  background-image: url('img/samples.svg');
 }
 
 /* Multiple images on same line */
@@ -20,7 +20,7 @@
 .image-set {
   background-image: image-set(
     'img/sample.avif' type('image/avif'),
-    'img/sample.webp' type('image/webp'),
+    'img/samples.svg' type('image/webp'),
     'img/sample.jpg' type('image/jpeg')
   );
 }
@@ -28,6 +28,7 @@
 /* Paths with query strings (should be skipped) */
 .existing-version {
   background-image: url('img/sample.jpg?v=123');
+  background-image: url('img/samples.svg?v=123');
 }
 
 /* Data URIs (should be skipped) */
