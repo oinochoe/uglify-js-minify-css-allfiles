@@ -28,27 +28,31 @@ import { resolveImagePath, resolveModulePath, makeRelativePath, containsFolder, 
  * @param {Logger} logger - Logger instance for tracking changes
  * @param {HashManager} hashManager - Manages content-based hashing for images
  * @param {string[]} targetExtensions - List of image extensions to process (e.g., ['.png', '.jpg'])
+ * @param {string} jsHashVersion - JS hash version string.
  * @returns {Promise<{content: string, modified: boolean}>} Modified content and whether changes were made
  */
-async function processPattern(pattern, content, fileExt, filePath, logger, hashManager, targetExtensions) {
+async function processPattern(pattern, content, fileExt, filePath, logger, hashManager, targetExtensions, jsHashVersion) {
   const promises = [];
   let newContent = content;
   let modified = false;
 
   if (fileExt === '.js') {
-    const newHash = crypto.randomBytes(16).toString('hex').substring(0, 8);
+    const newHash = jsHashVersion;
 
-    newContent = content.replace(pattern, (match, imagePath, ext, queryString) => {
+    newContent = content.replace(pattern, (match, quote, imagePath, endQuote) => {
       if (imagePath.startsWith('data:') || imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
         return match;
       }
+
+      const cleanPath = imagePath.split('?')[0];
+
       modified = true;
       logger?.info('Updated JS image version', {
         file: filePath,
-        image: imagePath + ext,
+        image: cleanPath,
         newHash,
       });
-      return `${imagePath}${ext}?v=${newHash}${queryString}`;
+      return `${quote}${cleanPath}?v=${newHash}${endQuote}`;
     });
     return { content: newContent, modified };
   }
@@ -107,9 +111,10 @@ async function processPattern(pattern, content, fileExt, filePath, logger, hashM
  * @param {string[]} [versioningOptions.extensions] - List of file extensions to version.
  * @param {Logger} logger - Logger instance.
  * @param {HashManager} hashManager - Hash manager instance.
+ * @param {string} jsHashVersion - JS hash version string.
  * @returns {Promise<void>}
  */
-async function updateImageReferences(filePath, versioningOptions, logger, hashManager) {
+async function updateImageReferences(filePath, versioningOptions, logger, hashManager, jsHashVersion) {
   const { extensions } = versioningOptions;
   const targetExtensions =
     extensions || DEFAULT_IMAGE_EXTENSIONS.map((ext) => (ext === 'jpe?g' ? ['.jpg', '.jpeg'] : ['.' + ext.replace('?', '')])).flat();
@@ -122,7 +127,7 @@ async function updateImageReferences(filePath, versioningOptions, logger, hashMa
     let modified = false;
 
     for (const pattern of patterns) {
-      const result = await processPattern(pattern, content, fileExt, filePath, logger, hashManager, targetExtensions);
+      const result = await processPattern(pattern, content, fileExt, filePath, logger, hashManager, targetExtensions, jsHashVersion);
       content = result.content;
       modified = modified || result.modified;
     }
@@ -286,6 +291,7 @@ export default async function minifyAll(contentPath, options = {}) {
   const rootDir = resolvePath(contentPath || '');
   const babelOptions = await resolveBabelOptions(useBabel);
   const hashManager = useVersioning ? new HashManager(rootDir) : null;
+  const jsHashVersion = useVersioning ? crypto.randomBytes(16).toString('hex').substring(0, 8) : '';
 
   if (hashManager) {
     await hashManager.initialize();
@@ -309,7 +315,7 @@ export default async function minifyAll(contentPath, options = {}) {
 
       // Apply versioning after successful processing if enabled
       if (useVersioning && hashManager) {
-        await updateImageReferences(filePath, useVersioning, logger, hashManager);
+        await updateImageReferences(filePath, useVersioning, logger, hashManager, jsHashVersion);
       }
 
       logger?.incrementProcessedFiles(filePath);

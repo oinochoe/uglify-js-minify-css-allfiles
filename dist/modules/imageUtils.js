@@ -24,7 +24,7 @@ export const IMAGE_PATTERNS = {
   ],
   js: [
     // Basic extension-based pattern for all quotes
-    new RegExp(`(['"\`])([^'"\`]*?\\.(?:${IMAGE_EXT_PATTERN}))(['"\`])`, 'gi'),
+    new RegExp(`(['"\`])([^'"\`]*?\\.(?:${IMAGE_EXT_PATTERN}))(?:\\?v=[^'"\`]*)?(['"\`])`, 'gi'),
   ],
 };
 
