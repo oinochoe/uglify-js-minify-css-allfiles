@@ -1,6 +1,10 @@
-/.vscode/
+.vscode/
 .prettierrc
 .gitignore
 package-lock.json
 yarn.lock
-
+logs/
+test/
+*.log
+*.md
+!README.md
