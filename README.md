@@ -124,9 +124,6 @@ Automatic versioning for image references in JS and CSS files:
 - Random hash generation for JS image references
 - Support for multiple image formats (PNG, JPEG, GIF, SVG, WebP, etc.)
 - Handles various image path formats:
-  - Absolute and relative paths
-  - Data URIs
-  - HTTP/HTTPS URLs
   - Complex CSS background declarations
   - image-set() syntax support
 
