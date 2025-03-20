@@ -8,4 +8,5 @@ minifyAll('./test/', {
   useVersioning: {
     extensions: ['.png', '.jpg', '.webp', '.avif', '.svg'],
   },
+  useJsMap: true,
 });

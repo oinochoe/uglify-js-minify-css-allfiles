@@ -19,6 +19,7 @@ You can easily minify all files in a specific folder, with the option to exclude
   - [Babel Integration](#babel-integration)
   - [Image Versioning](#image-versioning)
   - [Logging System](#logging-system)
+  - [Source Maps](#source-maps)
 - [API Reference](#api-reference)
 - [Minification Options](#minification-options)
 - [Contributing](#contributing)
@@ -33,6 +34,7 @@ You can easily minify all files in a specific folder, with the option to exclude
 - 🛡️ Configurable file exclusion
 - 🔄 ES module support
 - 📊 Processing statistics and summaries
+- 🔍 Source map generation for easier debugging
 
 ## Installation
 
@@ -91,6 +93,7 @@ await minifyAll('./src/', {
   useVersioning: {
     extensions: ['.png', '.jpg', '.jpeg', '.gif', '.svg', '.webp'],
   },
+  useJsMap: true,
 });
 ```
 
@@ -159,6 +162,22 @@ await minifyAll('./src/', {
 });
 ```
 
+### Source Maps
+
+Generate source maps for JavaScript files to aid in debugging minified code:
+
+- Maps compressed code back to original source code
+- Automatically creates `.map` files alongside minified JavaScript
+- Seamless integration with browser developer tools
+- Works with or without Babel transformation
+- Helps maintain debuggability in production environments
+
+```js
+await minifyAll('./src/', {
+  useJsMap: true,
+});
+```
+
 ## API Reference
 
 ### minifyAll(contentPath, options)
@@ -174,6 +193,7 @@ Main function to process files.
   - `cssMinifyOptions` (object): CSS minification options
   - `useVersioning` (object): Image versioning configuration
     - `extensions` (string[]): List of image extensions to version
+  - `useJsMap` (boolean): Enable source map generation for JavaScript files
 
 ### Babel Options
 

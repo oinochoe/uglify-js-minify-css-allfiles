@@ -180,6 +180,13 @@ declare module 'uglify-js-minify-css-allfiles' {
      * @default {}
      */
     cssMinifyOptions?: CSSMinifyOptions;
+
+    /**
+     * Enables source map generation for JavaScript files during minification.
+     * Source maps help with debugging by mapping minified code back to original source code.
+     * @default false
+     */
+    useJsMap?: boolean;
   }
 
   /**
@@ -206,7 +213,8 @@ declare module 'uglify-js-minify-css-allfiles' {
    *   useLog: {
    *     logLevel: 'warn',
    *     retentionDays: 7
-   *   }
+   *   },
+   *   useJsMap: true // Enable source map generation
    * });
    * ```
    */

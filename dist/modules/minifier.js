@@ -24,7 +24,12 @@ export function minifyJS(content, options = {}) {
   };
 
   const mergedOptions = { ...defaultOptions, ...options };
-  return uglifyJS(content, mergedOptions).code;
+  const result = uglifyJS(content, mergedOptions);
+
+  return {
+    code: result.code,
+    map: result.map,
+  };
 }
 
 /**

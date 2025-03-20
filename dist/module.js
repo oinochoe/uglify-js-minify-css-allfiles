@@ -13,6 +13,7 @@ import HashManager from './modules/hashManager.js';
 import { minifyJS, minifyCSS } from './modules/minifier.js';
 import { DEFAULT_IMAGE_EXTENSIONS, IMAGE_PATTERNS } from './modules/imageUtils.js';
 import { resolveImagePath, resolveModulePath, makeRelativePath, containsFolder, getExtension, resolvePath } from './modules/pathResolver.js';
+import path from 'path';
 
 /**
  * Processes image references in files and adds/updates version hashes for cache busting.
@@ -176,6 +177,7 @@ async function resolveBabelOptions(useBabel) {
  * @param {BabelOptions} [options.babelOptions] - Babel transformation options.
  * @param {Object} [options.jsMinifyOptions] - JavaScript minification options.
  * @param {Object} [options.cssMinifyOptions] - CSS minification options.
+ * @param {boolean} [options.useJsMap] - JavaScript map file options.
  * @returns {Promise<void>}
  */
 async function processFile(filePath, logger, options) {
@@ -185,25 +187,60 @@ async function processFile(filePath, logger, options) {
 
     let result;
     if (fileExtension === '.js') {
-      let transformed = fileContent;
+      let content = fileContent;
       if (options.babelOptions) {
         const babelCoreUrl = resolveModulePath('@babel/core');
         const { transformSync } = await import(babelCoreUrl);
-        transformed = transformSync(fileContent, options.babelOptions).code;
+
+        let babelOptions = {
+          ...options.babelOptions,
+        };
+
+        if (options.useJsMap) {
+          babelOptions = {
+            ...babelOptions,
+            filename: filePath,
+            sourceMaps: true,
+            sourceFileName: filePath,
+          };
+        }
+
+        content = transformSync(fileContent, babelOptions);
       }
-      result = minifyJS(transformed, options.jsMinifyOptions);
+
+      let jsMinifyOptions = { ...options.jsMinifyOptions };
+
+      if (options.useJsMap) {
+        jsMinifyOptions.sourceMap = {
+          includeSources: true,
+        };
+
+        if (options.babelOptions && content.map) {
+          jsMinifyOptions.sourceMap.content = JSON.stringify(content.map);
+        }
+      }
+
+      result = minifyJS(options.babelOptions ? content.code : content, jsMinifyOptions);
+
+      if (options.useJsMap) {
+        const fileName = path.basename(filePath);
+        const mapFilePath = filePath.replace('.js', '.js.map');
+
+        await writeFile(filePath, result.code + `\n//# sourceMappingURL=${fileName}.map`, logger);
+        await writeFile(mapFilePath, result.map, logger);
+      } else {
+        await writeFile(filePath, result.code, logger);
+      }
     } else if (fileExtension === '.css') {
       const output = await minifyCSS(fileContent, options.cssMinifyOptions);
       if (output.warnings.length > 0) {
         await logger?.warn('CSS minification warnings', { filePath, warnings: output.warnings });
       }
-      result = output.styles;
+      await writeFile(filePath, output.styles, logger);
     } else {
       // `Unsupported file type, skipping: ${filePath}`;
       return;
     }
-
-    await writeFile(filePath, result, logger);
   } catch (error) {
     await logger?.error('Error processing file', { filePath, error: error.message });
   }
@@ -262,6 +299,7 @@ async function processFile(filePath, logger, options) {
  * @property {JSMinifyOptions} [jsMinifyOptions={}] - Options for JavaScript minification.
  * @property {CSSMinifyOptions} [cssMinifyOptions={}] - Options for CSS minification.
  * @property {string[]|null} [useVersioning=null] - Options for file versioning.
+ * @property {boolean} [useJsMap=false] - Whether to use JavaScript Map file.
  */
 
 /**
@@ -273,7 +311,15 @@ async function processFile(filePath, logger, options) {
  * @throws {Error} If there's an issue reading or writing files.
  */
 export default async function minifyAll(contentPath, options = {}) {
-  const { excludeFolder = '', useBabel = false, useLog = true, jsMinifyOptions = {}, cssMinifyOptions = {}, useVersioning = null } = options;
+  const {
+    excludeFolder = '',
+    useBabel = false,
+    useLog = true,
+    jsMinifyOptions = {},
+    cssMinifyOptions = {},
+    useVersioning = null,
+    useJsMap = false,
+  } = options;
 
   let logger = null;
   if (useLog) {
@@ -285,6 +331,7 @@ export default async function minifyAll(contentPath, options = {}) {
       excludeFolder,
       useBabel,
       useVersioning: !!useVersioning,
+      useJsMap,
     });
   }
 
@@ -301,6 +348,7 @@ export default async function minifyAll(contentPath, options = {}) {
     babelOptions,
     jsMinifyOptions,
     cssMinifyOptions,
+    useJsMap,
   };
 
   try {
