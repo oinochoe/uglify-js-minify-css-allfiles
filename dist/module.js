@@ -177,6 +177,7 @@ async function resolveBabelOptions(useBabel) {
  * @param {BabelOptions} [options.babelOptions] - Babel transformation options.
  * @param {Object} [options.jsMinifyOptions] - JavaScript minification options.
  * @param {Object} [options.cssMinifyOptions] - CSS minification options.
+ * @param {Object} [options.postcssOptions] - PostCSS processing options.
  * @param {boolean} [options.useJsMap] - JavaScript map file options.
  * @returns {Promise<void>}
  */
@@ -232,7 +233,12 @@ async function processFile(filePath, logger, options) {
         await writeFile(filePath, result.code, logger);
       }
     } else if (fileExtension === '.css') {
-      const output = await minifyCSS(fileContent, options.cssMinifyOptions);
+      // PostCSS 옵션 설정
+      const postcssOptions = options.postcssOptions || null;
+
+      // CSS 처리 (PostCSS + CleanCSS)
+      const output = await minifyCSS(fileContent, options.cssMinifyOptions, postcssOptions, filePath);
+
       if (output.warnings.length > 0) {
         await logger?.warn('CSS minification warnings', { filePath, warnings: output.warnings });
       }
@@ -291,6 +297,16 @@ async function processFile(filePath, logger, options) {
  */
 
 /**
+ * Options for PostCSS configuration.
+ * @typedef {Object} PostCSSOptions
+ * @property {string[]|Object} [browsers] - Target browsers for the CSS compatibility.
+ * @property {0|1|2|3|4|5} [stage=2] - CSS features stage level.
+ * @property {Object} [features] - Specific CSS features to enable/disable.
+ * @property {Object} [autoprefixer] - Autoprefixer options.
+ * @property {Array} [plugins] - Additional PostCSS plugins to use.
+ */
+
+/**
  * Options for minification configuration.
  * @typedef {Object} MinifyOptions
  * @property {string} [excludeFolder=''] - Folder to exclude from minification.
@@ -298,6 +314,7 @@ async function processFile(filePath, logger, options) {
  * @property {boolean|LogOptions} [useLog=true] - Whether to use logging.
  * @property {JSMinifyOptions} [jsMinifyOptions={}] - Options for JavaScript minification.
  * @property {CSSMinifyOptions} [cssMinifyOptions={}] - Options for CSS minification.
+ * @property {PostCSSOptions|boolean} [usePostCSS=false] - PostCSS configuration options.
  * @property {string[]|null} [useVersioning=null] - Options for file versioning.
  * @property {boolean} [useJsMap=false] - Whether to use JavaScript Map file.
  */
@@ -317,6 +334,7 @@ export default async function minifyAll(contentPath, options = {}) {
     useLog = true,
     jsMinifyOptions = {},
     cssMinifyOptions = {},
+    usePostCSS = false,
     useVersioning = null,
     useJsMap = false,
   } = options;
@@ -329,7 +347,8 @@ export default async function minifyAll(contentPath, options = {}) {
     await logger.info('Starting minification process', {
       contentPath,
       excludeFolder,
-      useBabel,
+      useBabel: !!useBabel,
+      usePostCSS: !!usePostCSS,
       useVersioning: !!useVersioning,
       useJsMap,
     });
@@ -348,6 +367,7 @@ export default async function minifyAll(contentPath, options = {}) {
     babelOptions,
     jsMinifyOptions,
     cssMinifyOptions,
+    postcssOptions: usePostCSS === true ? {} : usePostCSS,
     useJsMap,
   };
 

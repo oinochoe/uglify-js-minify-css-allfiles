@@ -1,0 +1,105 @@
+/* 
+ * Modern CSS Examples for PostCSS Processing
+ * This file demonstrates features that will be processed by PostCSS
+ */
+
+/* Custom Properties (CSS Variables) */
+:root {
+  --primary-color: #3f51b5;
+  --secondary-color: #f50057;
+  --text-color: #212121;
+  --background-color: #f5f5f5;
+  --spacing-unit: 8px;
+  --border-radius: 4px;
+  --transition-speed: 0.3s;
+}
+
+/* Color Functional Notation */
+.color-examples {
+  /* Modern RGB/HSL syntax */
+  color: rgb(0 0 0 / 0.8);
+  background-color: hsl(206 100% 50% / 0.5);
+  border-color: color-mix(in srgb, var(--primary-color) 70%, var(--secondary-color) 30%);
+  box-shadow: 0 2px 10px rgb(0 0 0 / 0.1);
+}
+
+/* Nesting Rules */
+.card {
+  background-color: white;
+  border-radius: var(--border-radius);
+  padding: calc(var(--spacing-unit) * 2);
+  box-shadow: 0 2px 4px rgb(0 0 0 / 0.1);
+  transition: transform var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
+
+  /* Nested selector for header */
+  & .card-header {
+    color: var(--primary-color);
+    font-size: 1.2rem;
+    margin-bottom: calc(var(--spacing-unit) * 2);
+
+    /* Nested hover state */
+    &:hover {
+      color: var(--secondary-color);
+    }
+  }
+
+  /* Nested selector for content */
+  & .card-content {
+    color: var(--text-color);
+    line-height: 1.5;
+
+    /* Nested elements */
+    & p {
+      margin-bottom: var(--spacing-unit);
+    }
+
+    /* Nested pseudo classes */
+    & a {
+      color: var(--primary-color);
+      text-decoration: none;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+
+  /* Nested selector for footer */
+  & .card-footer {
+    margin-top: calc(var(--spacing-unit) * 2);
+    padding-top: var(--spacing-unit);
+    border-top: 1px solid rgb(0 0 0 / 0.1);
+
+    /* Nested with parent selector */
+    & button {
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      padding: var(--spacing-unit) calc(var(--spacing-unit) * 2);
+      border-radius: var(--border-radius);
+      cursor: pointer;
+      transition: background-color var(--transition-speed) ease;
+
+      &:hover {
+        background-color: color-mix(in srgb, var(--primary-color) 80%, black);
+      }
+    }
+  }
+
+  /* Card hover effect using parent selector */
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgb(0 0 0 / 0.15);
+  }
+}
+
+/* Media query with nesting */
+@media (max-width: 768px) {
+  .card {
+    padding: var(--spacing-unit);
+
+    & .card-header {
+      font-size: 1rem;
+    }
+  }
+}

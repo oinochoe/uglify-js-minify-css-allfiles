@@ -17,6 +17,7 @@ You can easily minify all files in a specific folder, with the option to exclude
 - [Options](#options)
 - [Advanced Features](#advanced-features)
   - [Babel Integration](#babel-integration)
+  - [PostCSS Processing](#postcss-processing)
   - [Image Versioning](#image-versioning)
   - [Logging System](#logging-system)
   - [Source Maps](#source-maps)
@@ -29,6 +30,7 @@ You can easily minify all files in a specific folder, with the option to exclude
 
 - 🚀 JavaScript and CSS minification with advanced options
 - 📦 Babel transformation support for modern JavaScript
+- 🎨 PostCSS processing for modern CSS features
 - 🖼️ Automatic image versioning and cache busting
 - 📝 Comprehensive logging system
 - 🛡️ Configurable file exclusion
@@ -66,6 +68,18 @@ await minifyAll('./src/', {
     modules: false,
     useBuiltIns: 'usage',
     corejs: 3,
+  },
+  usePostCSS: {
+    browsers: ['Chrome >= 40'],
+    stage: 2,
+    features: {
+      'nesting-rules': true,
+      'custom-properties': true,
+      'color-functional-notation': true,
+    },
+    autoprefixer: {
+      grid: true,
+    },
   },
   useLog: {
     logDir: 'logs',
@@ -117,6 +131,61 @@ await minifyAll('./src/', {
     corejs: 3,
   },
 });
+```
+
+### PostCSS Processing
+
+Process modern CSS features with PostCSS integration:
+
+- Process CSS with modern features like nesting rules, custom properties, and color functions
+- Automatically transpile modern CSS to be compatible with older browsers
+- Support for customizable browser targets
+- Integrated with the CSS minification pipeline
+
+```js
+await minifyAll('./src/', {
+  usePostCSS: {
+    browsers: ['Chrome >= 40'],
+    stage: 2,
+    features: {
+      'nesting-rules': true, // Enable CSS nesting
+      'custom-properties': true, // Enable CSS variables
+      'color-functional-notation': true, // Enable modern color syntax
+    },
+    autoprefixer: {
+      grid: true, // Enable grid features with autoprefixer
+    },
+  },
+});
+```
+
+### CSS Example with PostCSS Features
+
+```css
+/* CSS Variables */
+:root {
+  --primary-color: #3f51b5;
+  --secondary-color: #f50057;
+}
+
+/* Nesting Rules */
+.card {
+  background-color: white;
+
+  & .card-header {
+    color: var(--primary-color);
+
+    &:hover {
+      color: var(--secondary-color);
+    }
+  }
+}
+
+/* Modern Color Syntax */
+.color-examples {
+  color: rgb(0 0 0 / 0.8); /* Modern RGB syntax with alpha */
+  border-color: color-mix(in srgb, var(--primary-color) 70%, black 30%);
+}
 ```
 
 ### Image Versioning
@@ -188,6 +257,7 @@ Main function to process files.
 - `options` (object): Configuration options
   - `excludeFolder` (string): Directory to exclude
   - `useBabel` (boolean|object): Babel configuration
+  - `usePostCSS` (boolean|object): PostCSS configuration
   - `useLog` (boolean|object): Logging configuration
   - `jsMinifyOptions` (object): JavaScript minification options
   - `cssMinifyOptions` (object): CSS minification options
@@ -212,6 +282,28 @@ The `useBabel` object supports all @babel/preset-env options:
   configPath: string,
   ignoreBrowserslistConfig: boolean,
   shippedProposals: boolean
+}
+```
+
+### PostCSS Options
+
+The `usePostCSS` object supports the following options:
+
+```js
+{
+  browsers: string[] | Object,  // Browser targets
+  stage: 0 | 1 | 2 | 3 | 4 | 5,  // CSS feature stage level
+  features: {
+    'nesting-rules': boolean,  // CSS nesting rules
+    'custom-properties': boolean,  // CSS variables
+    'color-functional-notation': boolean,  // Modern color syntax
+    // Other CSS features...
+  },
+  autoprefixer: {
+    grid: boolean | 'autoplace' | 'no-autoplace'
+    // Other autoprefixer options...
+  },
+  plugins: Array  // Additional PostCSS plugins
 }
 ```
 

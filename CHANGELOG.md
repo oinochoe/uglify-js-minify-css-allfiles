@@ -5,6 +5,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.5.0] - 2025-03-25
+
+### Added
+
+- PostCSS integration for processing modern CSS features
+  - Support for CSS nesting rules using the `&` selector
+  - Process CSS variables (custom properties) for older browsers
+  - Transform modern color functional notation to browser-compatible formats
+  - Integration with postcss-preset-env for CSS feature level control
+- New `usePostCSS` option for enabling and configuring PostCSS processing
+  - Browser targets configuration
+  - Feature stage level control
+  - Selective feature enabling/disabling
+  - Autoprefixer integration with customizable options
+
+### Changed
+
+- Enhanced CSS processing pipeline to include PostCSS transformation before minification
+- Updated documentation with PostCSS examples and configuration options
+
 ## [2.4.0] - 2025-03-20
 
 ### Added
