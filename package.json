@@ -1,56 +1,56 @@
 {
-    "name": "uglify-js-minify-css-allfiles",
-    "version": "2.5.0",
-    "description": "you will be able to minify all files as same file names which is js or css",
-    "main": "minify.js",
-    "type": "module",
-    "types": "minify.d.ts",
-    "exports": {
-        ".": "./minify.js"
-    },
-    "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1"
-    },
-    "repository": {
-        "type": "git",
-        "url": "git+https://github.com/oinochoe/uglify-js-minify-css-allfiles.git"
-    },
-    "publishConfig": {
-        "registry": "https://registry.npmjs.org/"
-    },
-    "keywords": [
-        "ugly-code",
-        "uglyCode",
-        "uglify-js",
-        "minify-es6",
-        "uglifyjs-es6",
-        "minifycss",
-        "miniCss",
-        "cleanCss",
-        "minifyCss",
-        "comporessor",
-        "allfile minify",
-        "allfiles minify",
-        "all files uglify"
-    ],
-    "author": {
-        "name": "yeongmin kim",
-        "email": "copstyle86@gmail.com",
-        "url": "https://oinochoe.github.io/portfolio/"
-    },
-    "license": "MIT",
-    "bugs": {
-        "url": "https://github.com/oinochoe/uglify-js-minify-css-allfiles/issues",
-        "email": "copstyle86@gmail.com"
-    },
-    "homepage": "https://github.com/oinochoe/uglify-js-minify-css-allfiles#readme",
-    "devDependencies": {
-        "@babel/core": "^7.25.2",
-        "@babel/preset-env": "^7.25.3",
-        "clean-css": "^4.2.4",
-        "postcss": "^8.5.3",
-        "postcss-preset-env": "^10.1.5",
-        "uglify-js": "^3.19.2",
-        "uglify-js-es6": "^2.8.9"
-    }
+  "name": "uglify-js-minify-css-allfiles",
+  "version": "2.5.1",
+  "description": "you will be able to minify all files as same file names which is js or css",
+  "main": "minify.js",
+  "type": "module",
+  "types": "minify.d.ts",
+  "exports": {
+    ".": "./minify.js"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/oinochoe/uglify-js-minify-css-allfiles.git"
+  },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/"
+  },
+  "keywords": [
+    "ugly-code",
+    "uglyCode",
+    "uglify-js",
+    "minify-es6",
+    "uglifyjs-es6",
+    "minifycss",
+    "miniCss",
+    "cleanCss",
+    "minifyCss",
+    "comporessor",
+    "allfile minify",
+    "allfiles minify",
+    "all files uglify"
+  ],
+  "author": {
+    "name": "yeongmin kim",
+    "email": "copstyle86@gmail.com",
+    "url": "https://oinochoe.github.io/portfolio/"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/oinochoe/uglify-js-minify-css-allfiles/issues",
+    "email": "copstyle86@gmail.com"
+  },
+  "homepage": "https://github.com/oinochoe/uglify-js-minify-css-allfiles#readme",
+  "dependencies": {
+    "@babel/core": "^7.25.2",
+    "@babel/preset-env": "^7.25.3",
+    "clean-css": "^4.2.4",
+    "postcss": "^8.5.3",
+    "postcss-preset-env": "^10.1.5",
+    "uglify-js": "^3.19.2",
+    "uglify-js-es6": "^2.8.9"
+  }
 }
