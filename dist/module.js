@@ -179,6 +179,7 @@ async function resolveBabelOptions(useBabel) {
  * @param {Object} [options.cssMinifyOptions] - CSS minification options.
  * @param {Object} [options.postcssOptions] - PostCSS processing options.
  * @param {boolean} [options.useJsMap] - JavaScript map file options.
+ * @param {boolean} [options.useCssMap] - Css map file options.
  * @returns {Promise<void>}
  */
 async function processFile(filePath, logger, options) {
@@ -233,16 +234,32 @@ async function processFile(filePath, logger, options) {
         await writeFile(filePath, result.code, logger);
       }
     } else if (fileExtension === '.css') {
-      // PostCSS 옵션 설정
       const postcssOptions = options.postcssOptions || null;
-
-      // CSS 처리 (PostCSS + CleanCSS)
-      const output = await minifyCSS(fileContent, options.cssMinifyOptions, postcssOptions, filePath);
+      const output = await minifyCSS(fileContent, options.cssMinifyOptions, postcssOptions, filePath, options.useCssMap);
 
       if (output.warnings.length > 0) {
         await logger?.warn('CSS minification warnings', { filePath, warnings: output.warnings });
       }
-      await writeFile(filePath, output.styles, logger);
+
+      if (options.useCssMap && output.sourceMap) {
+        const fileName = path.basename(filePath);
+        const mapFilePath = filePath.replace('.css', '.css.map');
+
+        // Add source map reference to the CSS file
+        const sourceMapComment = `\n/*# sourceMappingURL=${fileName}.map */`;
+        await writeFile(filePath, output.styles + sourceMapComment, logger);
+
+        // Write the source map file
+        try {
+          const sourceMap = JSON.stringify(output.sourceMap);
+          await writeFile(mapFilePath, sourceMap, logger);
+          await logger?.info('Generated CSS source map', { filePath: mapFilePath });
+        } catch (error) {
+          await logger?.error('Failed to write CSS source map', { filePath: mapFilePath, error: error.message });
+        }
+      } else {
+        await writeFile(filePath, output.styles, logger);
+      }
     } else {
       // `Unsupported file type, skipping: ${filePath}`;
       return;
@@ -317,6 +334,7 @@ async function processFile(filePath, logger, options) {
  * @property {PostCSSOptions|boolean} [usePostCSS=false] - PostCSS configuration options.
  * @property {string[]|null} [useVersioning=null] - Options for file versioning.
  * @property {boolean} [useJsMap=false] - Whether to use JavaScript Map file.
+ * @property {boolean} [useCssMap=false] - Whether to use CSS Map file.
  */
 
 /**
@@ -337,6 +355,7 @@ export default async function minifyAll(contentPath, options = {}) {
     usePostCSS = false,
     useVersioning = null,
     useJsMap = false,
+    useCssMap = false,
   } = options;
 
   let logger = null;
@@ -351,6 +370,7 @@ export default async function minifyAll(contentPath, options = {}) {
       usePostCSS: !!usePostCSS,
       useVersioning: !!useVersioning,
       useJsMap,
+      useCssMap,
     });
   }
 
@@ -369,6 +389,7 @@ export default async function minifyAll(contentPath, options = {}) {
     cssMinifyOptions,
     postcssOptions: usePostCSS === true ? {} : usePostCSS,
     useJsMap,
+    useCssMap,
   };
 
   try {

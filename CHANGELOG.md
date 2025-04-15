@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.6.0] - 2025-04-15
+
+### Added
+- New `useCssMap` option to enable source map generation for CSS files
+  - Creates source maps for minified CSS files to aid debugging
+  - Automatically generates `.css.map` files alongside minified CSS
+  - Works with or without PostCSS transformation
+  - Preserves original source information for easier style debugging
+  - Integrates with browser developer tools for seamless inspection
+
+### Changed
+- Enhanced documentation to include CSS source map examples and usage
+
 ## [2.5.1] - 2025-03-26
 
 ### Fixed

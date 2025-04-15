@@ -21,4 +21,5 @@ minifyAll('./test/', {
     extensions: ['.png', '.jpg', '.webp', '.avif', '.svg'],
   },
   useJsMap: true,
+  useCssMap: true,
 });

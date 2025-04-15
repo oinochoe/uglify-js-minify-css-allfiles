@@ -43,15 +43,19 @@ export function minifyJS(content, options = {}) {
  * @param {Object} [options={}] - Clean-CSS options.
  * @param {Object} [postcssOptions=null] - PostCSS configuration options, if null PostCSS is skipped.
  * @param {string} [filePath=''] - Path to the file being processed.
- * @returns {Promise<{styles: string, warnings: string[]}>} Minified CSS and warnings.
+ * @param {boolean} [useCssMap=false] - Whether to generate and use a CSS source map file.
+ * @returns {Promise<{styles: string, warnings: string[], map: string}>} Minified CSS, warnings and source map.
  */
-export async function minifyCSS(content, options = {}, postcssOptions = null, filePath = '') {
+export async function minifyCSS(content, options = {}, postcssOptions = null, filePath = '', useCssMap = false) {
   const defaultOptions = {
     level: { 1: { all: false } },
+    sourceMap: !!useCssMap,
+    sourceMapInlineSources: !!useCssMap,
   };
 
   const mergedOptions = { ...defaultOptions, ...options };
   let processedCSS = content;
+  let previousSourceMap = null;
 
   // Check if PostCSS is available and enabled
   if (postCSSAvailable === null) {
@@ -63,6 +67,10 @@ export async function minifyCSS(content, options = {}, postcssOptions = null, fi
     try {
       const result = await processWithPostCSS(content, filePath, postcssOptions);
       processedCSS = result.css;
+
+      if (result.map) {
+        previousSourceMap = result.map.toString();
+      }
 
       // Handle warnings
       if (result.messages && result.messages.length > 0) {
@@ -76,6 +84,6 @@ export async function minifyCSS(content, options = {}, postcssOptions = null, fi
 
   // Use CleanCSS for final minification
   return new Promise((resolve) => {
-    new CleanCSS(mergedOptions).minify(processedCSS, (error, output) => resolve(output));
+    new CleanCSS(mergedOptions).minify(processedCSS, previousSourceMap, (error, output) => resolve(output));
   });
 }

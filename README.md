@@ -108,6 +108,7 @@ await minifyAll('./src/', {
     extensions: ['.png', '.jpg', '.jpeg', '.gif', '.svg', '.webp'],
   },
   useJsMap: true,
+  useCssMap: true
 });
 ```
 
@@ -233,19 +234,19 @@ await minifyAll('./src/', {
 
 ### Source Maps
 
-Generate source maps for JavaScript files to aid in debugging minified code:
+Generate source maps for both JavaScript and CSS files to aid in debugging minified code:
 
 - Maps compressed code back to original source code
-- Automatically creates `.map` files alongside minified JavaScript
+- Automatically creates `.map` files alongside minified files
 - Seamless integration with browser developer tools
-- Works with or without Babel transformation
+- Works with or without Babel/PostCSS transformation
 - Helps maintain debuggability in production environments
 
 ```js
 await minifyAll('./src/', {
   useJsMap: true,
+  useCssMap: true
 });
-```
 
 ## API Reference
 
@@ -264,6 +265,7 @@ Main function to process files.
   - `useVersioning` (object): Image versioning configuration
     - `extensions` (string[]): List of image extensions to version
   - `useJsMap` (boolean): Enable source map generation for JavaScript files
+  - `useCssMap` (boolean): Enable source map generation for CSS files
 
 ### Babel Options
 

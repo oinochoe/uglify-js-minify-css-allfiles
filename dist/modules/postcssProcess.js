@@ -52,11 +52,13 @@ export async function processWithPostCSS(content, filePath = '', options = {}) {
     const result = await postcss(plugins).process(content, {
       from: filePath || undefined,
       to: filePath || undefined,
+      map: { inline: true },
     });
 
     return {
       css: result.css,
       messages: result.messages,
+      map: result.map,
     };
   } catch (error) {
     console.error('Error processing CSS with PostCSS:', error);
