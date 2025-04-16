@@ -149,6 +149,9 @@ async function updateImageReferences(filePath, versioningOptions, logger, hashMa
 
 /**
  * Resolves Babel options based on the provided configuration.
+ * Supports custom plugins through the useBabel.plugins option.
+ *
+ * @async
  * @param {boolean|BabelOptions} useBabel - The Babel options object or boolean.
  * @returns {Promise<BabelOptions|null>} - A promise that resolves to the Babel options or null if disabled.
  */
@@ -159,11 +162,34 @@ async function resolveBabelOptions(useBabel) {
     const presetEnvUrl = resolveModulePath('@babel/preset-env');
     const presetEnv = await import(presetEnvUrl);
 
-    return {
-      presets: [[presetEnv.default, typeof useBabel === 'object' ? useBabel : {}]],
+    const options = typeof useBabel === 'object' ? useBabel : {};
+    const { useAppendTransform, plugins, ...presetOptions } = options;
+
+    const babelConfig = {
+      presets: [[presetEnv.default, presetOptions]],
+      plugins: [],
     };
+
+    // Handle custom plugins if provided
+    if (plugins && Array.isArray(plugins)) {
+      babelConfig.plugins.push(...plugins);
+    }
+
+    // Add appendTransform plugin if useAppendTransform option is enabled
+    if (useAppendTransform) {
+      try {
+        const appendTransformPluginModule = await import('./plugins/append-polyfill-plugin.js');
+        const appendTransformPlugin = appendTransformPluginModule.default;
+        babelConfig.plugins.push(appendTransformPlugin);
+      } catch (pluginError) {
+        console.error('Error loading append transform plugin:', pluginError);
+        console.error(pluginError.stack);
+      }
+    }
+
+    return babelConfig;
   } catch (error) {
-    console.error('Error loading @babel/preset-env:', error);
+    console.error('Error loading @babel/preset-env or plugins:', error);
     return null;
   }
 }
@@ -283,6 +309,8 @@ async function processFile(filePath, logger, options) {
  * @property {string} [configPath] - Path to the configuration file.
  * @property {boolean} [ignoreBrowserslistConfig] - Ignores the browserslist configuration.
  * @property {boolean} [shippedProposals] - Enables support for shipped proposals.
+ * @property {boolean} [useAppendTransform] - Enables the append-to-appendChild transform plugin for compatibility with older browsers.
+ * @property {Array<string|Array|Function>} [plugins] - Additional Babel plugins to include in the transformation process.
  */
 
 /**

@@ -5,6 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.7.0] - 2025-04-16
+
+### Added
+- New `useAppendTransform` option for Babel configuration
+  - Automatically transforms `Element.append()` calls to `Element.appendChild()` for older browsers
+  - Handles both node elements and string content appropriately
+  - Provides compatibility with browsers like Chrome 35 that don't support `append` method
+  - Properly manages multiple arguments to `append` method
+- Enhanced Babel plugin support with custom plugins option
+  - Added support for custom Babel plugins through the `plugins` property
+  - Allows specifying plugins as strings, arrays, or function references
+  - Seamlessly integrates user plugins with built-in transformations
+
+### Changed
+- Improved Babel configuration handling by separating preset options from plugin options
+- Enhanced error handling for plugin loading failures
+
 ## [2.6.0] - 2025-04-15
 
 ### Added

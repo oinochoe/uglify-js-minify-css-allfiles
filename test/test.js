@@ -82,6 +82,7 @@ class ModernBank {
 
 // Usage example
 (async () => {
+  document.querySelector('body').append('<div>useAppendTransform</div>');
   const account = new ModernBank(1000);
   account.deposit(500);
   account.withdraw(200, { fee: 5, description: 'ATM withdrawal ' });

@@ -16,6 +16,8 @@ minifyAll('./test/', {
   },
   useBabel: {
     targets: 'chrome 40',
+    useAppendTransform: false,
+    plugins: [],
   },
   useVersioning: {
     extensions: ['.png', '.jpg', '.webp', '.avif', '.svg'],

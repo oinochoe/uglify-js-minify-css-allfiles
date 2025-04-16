@@ -56,6 +56,17 @@ declare module 'uglify-js-minify-css-allfiles' {
      * Toggles enabling support for builtin/feature proposals that have shipped in browsers.
      */
     shippedProposals?: boolean;
+
+    /**
+     * Enables the append-to-appendChild transform plugin.
+     * When true, Element.append() calls are transformed to Element.appendChild() calls for compatibility with older browsers like Chrome 35.
+     */
+    useAppendTransform?: boolean;
+
+    /**
+     * Additional Babel plugins to include in the transformation process.
+     */
+    plugins?: Array<string | Array | Function>;
   }
 
   /**

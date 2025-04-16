@@ -68,6 +68,8 @@ await minifyAll('./src/', {
     modules: false,
     useBuiltIns: 'usage',
     corejs: 3,
+    useAppendTransform: true,
+    plugins: ['@babel/plugin-proposal-class-properties'],
   },
   usePostCSS: {
     browsers: ['Chrome >= 40'],
@@ -283,7 +285,9 @@ The `useBabel` object supports all @babel/preset-env options:
   forceAllTransforms: boolean,
   configPath: string,
   ignoreBrowserslistConfig: boolean,
-  shippedProposals: boolean
+  shippedProposals: boolean,
+  useAppendTransform: boolean,
+  plugins: Array<string|Array|Function>
 }
 ```
 
