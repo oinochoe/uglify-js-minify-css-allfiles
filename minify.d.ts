@@ -66,7 +66,43 @@ declare module 'uglify-js-minify-css-allfiles' {
     /**
      * Additional Babel plugins to include in the transformation process.
      */
-    plugins?: Array<string | Array | Function>;
+    plugins?: Array<string | any[] | Function>;
+  }
+
+  /**
+   * Configuration options for PostCSS processing.
+   */
+  export interface PostCSSOptions {
+    /**
+     * Target browsers for the CSS compatibility.
+     * Can be an array of browser strings or a browserslist configuration object.
+     */
+    browsers?: string[] | { [key: string]: any };
+
+    /**
+     * CSS features stage level.
+     * @default 2
+     */
+    stage?: 0 | 1 | 2 | 3 | 4 | 5;
+
+    /**
+     * Specific CSS features to enable/disable.
+     */
+    features?: {
+      [key: string]: boolean;
+    };
+
+    /**
+     * Autoprefixer options.
+     */
+    autoprefixer?: {
+      [key: string]: any;
+    };
+
+    /**
+     * Additional PostCSS plugins to use.
+     */
+    plugins?: Array<any>;
   }
 
   /**
@@ -173,6 +209,14 @@ declare module 'uglify-js-minify-css-allfiles' {
     useBabel?: boolean | BabelOptions;
 
     /**
+     * Enables PostCSS processing of CSS files.
+     * If true, uses default PostCSS settings.
+     * If an object is provided, it should conform to the PostCSSOptions interface.
+     * @default false
+     */
+    usePostCSS?: boolean | PostCSSOptions;
+
+    /**
      * Configures logging behavior.
      * If true, uses default logging settings.
      * If an object is provided, it should conform to the LogOptions interface.
@@ -228,12 +272,24 @@ declare module 'uglify-js-minify-css-allfiles' {
    *     useBuiltIns: 'usage',
    *     corejs: 3
    *   },
+   *   usePostCSS: {
+   *     browsers: ['Chrome >= 40'],
+   *     stage: 2,
+   *     features: {
+   *       'nesting-rules': true,
+   *       'custom-properties': true,
+   *       'color-functional-notation': true,
+   *     },
+   *     autoprefixer: {
+   *       grid: true,
+   *     },
+   *   },
    *   useLog: {
    *     logLevel: 'warn',
    *     retentionDays: 7
    *   },
-   *   useJsMap: true // Enable source map generation
-   *   useCssMap: true // Enable source map generation
+   *   useJsMap: true,
+   *   useCssMap: true
    * });
    * ```
    */

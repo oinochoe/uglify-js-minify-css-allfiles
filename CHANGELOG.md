@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.7.1] - 2025-05-07
+
+### Changed
+- Updated TypeScript type definitions:
+  - Fixed Babel plugins type definition from `Array<string | Array | Function>` to `Array<string | any[] | Function>` to properly reflect actual usage
+  - Added PostCSSOptions interface for PostCSS configuration
+  - Added type definitions for browser targets, stage levels, and features
+  - Added autoprefixer and custom plugins type support
+
 ## [2.7.0] - 2025-04-16
 
 ### Added
