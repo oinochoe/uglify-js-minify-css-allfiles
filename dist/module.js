@@ -98,7 +98,6 @@ async function processPattern(pattern, content, fileExt, filePath, logger, hashM
       }
     }
 
-    await Promise.all(promises.filter((p) => p instanceof Promise));
   }
 
   return { content: newContent, modified };
@@ -252,7 +251,7 @@ async function processFile(filePath, logger, options) {
 
       if (options.useJsMap) {
         const fileName = path.basename(filePath);
-        const mapFilePath = filePath.replace('.js', '.js.map');
+        const mapFilePath = filePath.replace(/\.js$/, '.js.map');
 
         await writeFile(filePath, result.code + `\n//# sourceMappingURL=${fileName}.map`, logger);
         await writeFile(mapFilePath, result.map, logger);
@@ -269,7 +268,7 @@ async function processFile(filePath, logger, options) {
 
       if (options.useCssMap && output.sourceMap) {
         const fileName = path.basename(filePath);
-        const mapFilePath = filePath.replace('.css', '.css.map');
+        const mapFilePath = filePath.replace(/\.css$/, '.css.map');
 
         // Add source map reference to the CSS file
         const sourceMapComment = `\n/*# sourceMappingURL=${fileName}.map */`;
