@@ -34,18 +34,21 @@ const DEFAULT_OPTIONS = {
  */
 export async function processWithPostCSS(content, filePath = '', options = {}) {
   try {
+    // Separate custom plugins from preset-env options
+    const { plugins: customPlugins, ...presetEnvInput } = options;
+
     // Merge options with defaults
     const presetEnvOptions = {
       ...DEFAULT_OPTIONS,
-      ...options,
+      ...presetEnvInput,
     };
 
     // Configure plugins
     const plugins = [postcssPresetEnv(presetEnvOptions)];
 
     // Add any custom plugins from options
-    if (options.plugins && Array.isArray(options.plugins)) {
-      plugins.push(...options.plugins);
+    if (customPlugins && Array.isArray(customPlugins)) {
+      plugins.push(...customPlugins);
     }
 
     // Process the CSS

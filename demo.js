@@ -13,6 +13,10 @@ minifyAll('./test/', {
     autoprefixer: {
       grid: true,
     },
+    // Add any PostCSS-compatible plugins here.
+    // Each plugin is appended after postcss-preset-env in the processing pipeline.
+    // Example: plugins: [postcssImport(), postcssMixins()]
+    plugins: [],
   },
   useBabel: {
     targets: 'chrome 40',

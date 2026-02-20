@@ -5,6 +5,29 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.8.0] - 2026-02-20
+
+### Added
+- PostCSS custom plugins support via `usePostCSS.plugins` option
+  - Append any PostCSS-compatible plugin to the processing pipeline
+  - Custom plugins are applied after `postcss-preset-env`, receiving already-transformed CSS
+  - Supports plugin instances, factory functions, and any standard PostCSS plugin format
+- Added `useVersioning` type definition to `MinifyOptions` in TypeScript declarations (previously missing)
+
+### Fixed
+- Fixed a bug where `plugins` passed to `usePostCSS` was incorrectly forwarded to `postcss-preset-env` options
+  - Now properly separated before being merged into preset-env configuration
+- Fixed missing closing code fence in README Source Maps section (API Reference section was incorrectly rendered inside a code block)
+- Fixed `useVersioning` JSDoc type in `module.js` from `{string[]|null}` to `{{extensions?: string[]}|null}`
+
+### Changed
+- Updated README with PostCSS custom plugins documentation and usage examples
+- Added PostCSS Options reference table to API Reference section
+- Fixed README Table of Contents dead links (`Parameters`, `Options`, `Minification Options` headings did not exist)
+- Updated README Advanced Usage example to use ESM `import` syntax instead of `require()` for PostCSS plugins
+- Updated `minify.d.ts` JSDoc example to include `plugins` in `usePostCSS`
+- Updated `demo.js` to include `plugins` option in `usePostCSS` with usage comments
+
 ## [2.7.1] - 2025-05-07
 
 ### Changed

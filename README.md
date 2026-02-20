@@ -13,8 +13,6 @@ You can easily minify all files in a specific folder, with the option to exclude
 - [Installation](#installation)
 - [Features](#features)
 - [Usage](#usage)
-- [Parameters](#parameters)
-- [Options](#options)
 - [Advanced Features](#advanced-features)
   - [Babel Integration](#babel-integration)
   - [PostCSS Processing](#postcss-processing)
@@ -22,7 +20,6 @@ You can easily minify all files in a specific folder, with the option to exclude
   - [Logging System](#logging-system)
   - [Source Maps](#source-maps)
 - [API Reference](#api-reference)
-- [Minification Options](#minification-options)
 - [Contributing](#contributing)
 - [License](#license)
 
@@ -60,6 +57,8 @@ await minifyAll('./src/');
 
 ```js
 import minifyAll from 'uglify-js-minify-css-allfiles';
+import postcssImport from 'postcss-import';
+import postcssMixins from 'postcss-mixins';
 
 await minifyAll('./src/', {
   excludeFolder: 'node_modules',
@@ -82,6 +81,10 @@ await minifyAll('./src/', {
     autoprefixer: {
       grid: true,
     },
+    plugins: [
+      postcssImport(),
+      postcssMixins(),
+    ],
   },
   useLog: {
     logDir: 'logs',
@@ -144,6 +147,7 @@ Process modern CSS features with PostCSS integration:
 - Automatically transpile modern CSS to be compatible with older browsers
 - Support for customizable browser targets
 - Integrated with the CSS minification pipeline
+- **Extensible with any PostCSS plugin**
 
 ```js
 await minifyAll('./src/', {
@@ -161,6 +165,32 @@ await minifyAll('./src/', {
   },
 });
 ```
+
+#### PostCSS Custom Plugins
+
+You can extend the PostCSS pipeline with any additional plugins via the `plugins` option.
+Custom plugins are appended **after** `postcss-preset-env`, so they receive the already-transformed CSS.
+
+```js
+import postcssImport from 'postcss-import';
+import postcssMixins from 'postcss-mixins';
+import postcssCustomMedia from 'postcss-custom-media';
+
+await minifyAll('./src/', {
+  usePostCSS: {
+    browsers: ['Chrome >= 40'],
+    stage: 2,
+    plugins: [
+      postcssImport(),        // Resolve @import rules
+      postcssMixins(),        // Enable CSS mixins
+      postcssCustomMedia(),   // Enable @custom-media queries
+    ],
+  },
+});
+```
+
+> **Note:** Each plugin must be a PostCSS-compatible plugin instance or factory function.
+> Install any extra plugins separately (e.g. `npm i postcss-import`).
 
 ### CSS Example with PostCSS Features
 
@@ -249,6 +279,7 @@ await minifyAll('./src/', {
   useJsMap: true,
   useCssMap: true
 });
+```
 
 ## API Reference
 
@@ -261,6 +292,7 @@ Main function to process files.
   - `excludeFolder` (string): Directory to exclude
   - `useBabel` (boolean|object): Babel configuration
   - `usePostCSS` (boolean|object): PostCSS configuration
+    - `plugins` (Array): Additional PostCSS plugins (appended after `postcss-preset-env`)
   - `useLog` (boolean|object): Logging configuration
   - `jsMinifyOptions` (object): JavaScript minification options
   - `cssMinifyOptions` (object): CSS minification options
@@ -287,7 +319,7 @@ The `useBabel` object supports all @babel/preset-env options:
   ignoreBrowserslistConfig: boolean,
   shippedProposals: boolean,
   useAppendTransform: boolean,
-  plugins: Array<string|Array|Function>
+  plugins: Array<string|any[]|Function>
 }
 ```
 
@@ -309,9 +341,17 @@ The `usePostCSS` object supports the following options:
     grid: boolean | 'autoplace' | 'no-autoplace'
     // Other autoprefixer options...
   },
-  plugins: Array  // Additional PostCSS plugins
+  plugins: Array<PostCSSPlugin>  // Additional PostCSS plugins (appended after postcss-preset-env)
 }
 ```
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `browsers` | `string[] \| Object` | `['Chrome >= 40']` | Browser targets passed to postcss-preset-env |
+| `stage` | `0–5` | `2` | CSS feature stage level |
+| `features` | `Object` | see defaults | Granular feature toggles |
+| `autoprefixer` | `Object` | `{ grid: true }` | Autoprefixer options |
+| `plugins` | `Array` | `[]` | Additional PostCSS plugins, appended after `postcss-preset-env` |
 
 ### JavaScript Minification Options
 
