@@ -310,7 +310,7 @@ async function processFile(filePath, logger, options) {
  * @property {boolean} [ignoreBrowserslistConfig] - Ignores the browserslist configuration.
  * @property {boolean} [shippedProposals] - Enables support for shipped proposals.
  * @property {boolean} [useAppendTransform] - Enables the append-to-appendChild transform plugin for compatibility with older browsers.
- * @property {Array<string|Array|Function>} [plugins] - Additional Babel plugins to include in the transformation process.
+ * @property {Array<string|any[]|Function>} [plugins] - Additional Babel plugins to include in the transformation process.
  */
 
 /**
@@ -360,7 +360,7 @@ async function processFile(filePath, logger, options) {
  * @property {JSMinifyOptions} [jsMinifyOptions={}] - Options for JavaScript minification.
  * @property {CSSMinifyOptions} [cssMinifyOptions={}] - Options for CSS minification.
  * @property {PostCSSOptions|boolean} [usePostCSS=false] - PostCSS configuration options.
- * @property {string[]|null} [useVersioning=null] - Options for file versioning.
+ * @property {{extensions?: string[]}|null} [useVersioning=null] - Options for file versioning.
  * @property {boolean} [useJsMap=false] - Whether to use JavaScript Map file.
  * @property {boolean} [useCssMap=false] - Whether to use CSS Map file.
  */

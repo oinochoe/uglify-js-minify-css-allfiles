@@ -237,6 +237,15 @@ declare module 'uglify-js-minify-css-allfiles' {
     cssMinifyOptions?: CSSMinifyOptions;
 
     /**
+     * Enables automatic image versioning (cache busting) for image references in JS and CSS files.
+     * Content-based hashing is used for CSS images; random hashes are used for JS image references.
+     */
+    useVersioning?: {
+      /** List of image file extensions to version (e.g. ['.png', '.jpg', '.svg']). */
+      extensions?: string[];
+    };
+
+    /**
      * Enables source map generation for JavaScript files during minification.
      * Source maps help with debugging by mapping minified code back to original source code.
      * @default false
@@ -283,6 +292,7 @@ declare module 'uglify-js-minify-css-allfiles' {
    *     autoprefixer: {
    *       grid: true,
    *     },
+   *     plugins: [],
    *   },
    *   useLog: {
    *     logLevel: 'warn',
