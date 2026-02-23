@@ -2,7 +2,8 @@
  * Babel plugin to transform Element.append() calls to be compatible with older browsers.
  * This plugin converts:
  * - element.append("text") to element.appendChild(document.createTextNode("text"))
- * - element.append(node) to element.appendChild(node)
+ * - element.append(3) to element.appendChild(document.createTextNode(3))
+ * - element.append(node) to element.appendChild(node instanceof Node ? node : document.createTextNode(String(node)))
  * - element.append(node1, "text", node2) to a sequence of appendChild calls
  *
  * @param {Object} param0 - Babel plugin parameters
@@ -10,6 +11,34 @@
  * @returns {Object} Babel plugin object
  */
 export default function ({ types: t }) {
+  function createTextNodeExpression(arg) {
+    return t.callExpression(t.memberExpression(t.identifier('document'), t.identifier('createTextNode')), [arg]);
+  }
+
+  function isLiteral(node) {
+    return (
+      t.isStringLiteral(node) ||
+      t.isNumericLiteral(node) ||
+      t.isBooleanLiteral(node) ||
+      t.isNullLiteral(node) ||
+      t.isTemplateLiteral(node)
+    );
+  }
+
+  function toAppendChildArg(arg) {
+    // Known primitives: always wrap with createTextNode
+    if (isLiteral(arg)) {
+      return createTextNodeExpression(arg);
+    }
+    // Unknown values (variables, expressions): runtime check
+    // If it's a Node, use directly; otherwise wrap with createTextNode
+    return t.conditionalExpression(
+      t.binaryExpression('instanceof', t.cloneNode(arg), t.identifier('Node')),
+      t.cloneNode(arg),
+      createTextNodeExpression(t.cloneNode(arg)),
+    );
+  }
+
   return {
     name: 'append-polyfill-transform',
     visitor: {
@@ -28,39 +57,22 @@ export default function ({ types: t }) {
 
         // Handle single argument case
         if (args.length === 1) {
-          const arg = args[0];
-
-          // String literal case: element.append("text")
-          if (t.isStringLiteral(arg)) {
-            path.replaceWith(
-              t.callExpression(t.memberExpression(t.cloneNode(objectNode), t.identifier('appendChild')), [
-                t.callExpression(t.memberExpression(t.identifier('document'), t.identifier('createTextNode')), [arg]),
-              ]),
-            );
-          } else {
-            // Node case: element.append(node)
-            callee.get('property').replaceWith(t.identifier('appendChild'));
-          }
+          path.replaceWith(
+            t.callExpression(t.memberExpression(t.cloneNode(objectNode), t.identifier('appendChild')), [
+              toAppendChildArg(args[0]),
+            ]),
+          );
           return;
         }
 
         // Handle multiple arguments: element.append(node1, "text", node2)
-        const statements = args.map((arg) => {
-          // String literal case
-          if (t.isStringLiteral(arg)) {
-            return t.callExpression(t.memberExpression(t.cloneNode(objectNode), t.identifier('appendChild')), [
-              t.callExpression(t.memberExpression(t.identifier('document'), t.identifier('createTextNode')), [arg]),
-            ]);
-          } else {
-            // Node case
-            return t.callExpression(t.memberExpression(t.cloneNode(objectNode), t.identifier('appendChild')), [arg]);
-          }
-        });
+        const statements = args.map((arg) =>
+          t.callExpression(t.memberExpression(t.cloneNode(objectNode), t.identifier('appendChild')), [
+            toAppendChildArg(arg),
+          ]),
+        );
 
-        if (statements.length > 0) {
-          // Combine multiple statements into a sequence expression
-          path.replaceWith(t.sequenceExpression(statements));
-        }
+        path.replaceWith(t.sequenceExpression(statements));
       },
     },
   };
