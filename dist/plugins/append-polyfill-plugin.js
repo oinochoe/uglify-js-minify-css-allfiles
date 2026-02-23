@@ -1,5 +1,7 @@
 /**
- * Babel plugin to transform Element.append() calls to be compatible with older browsers.
+ * Babel plugin to transform native DOM Element.append() calls to be compatible with older browsers.
+ * Skips jQuery/library .append() calls (e.g., $(...).append(), jQuery(...).append()).
+ *
  * This plugin converts:
  * - element.append("text") to element.appendChild(document.createTextNode("text"))
  * - element.append(3) to element.appendChild(document.createTextNode(3))
@@ -39,6 +41,35 @@ export default function ({ types: t }) {
     );
   }
 
+  /**
+   * Checks if the object of a .append() call is a jQuery/library wrapper.
+   * Skips patterns like: $(...).append(), jQuery(...).append(), $el.append(),
+   * $(...).find(...).append() (chained jQuery calls)
+   */
+  function isJQueryCall(objectPath) {
+    const node = objectPath.node;
+
+    // $(...).append() or jQuery(...).append()
+    if (t.isCallExpression(node)) {
+      const callee = node.callee;
+      // $() or jQuery()
+      if (t.isIdentifier(callee, { name: '$' }) || t.isIdentifier(callee, { name: 'jQuery' })) {
+        return true;
+      }
+      // $(...).find(...).append() — chained jQuery method calls
+      if (t.isMemberExpression(callee) && t.isCallExpression(callee.object)) {
+        return isJQueryCall(objectPath.get('callee').get('object'));
+      }
+    }
+
+    // $el.append() — variables starting with $
+    if (t.isIdentifier(node) && node.name.startsWith('$')) {
+      return true;
+    }
+
+    return false;
+  }
+
   return {
     name: 'append-polyfill-transform',
     visitor: {
@@ -48,6 +79,9 @@ export default function ({ types: t }) {
         // Check for element.append(...) call pattern
         if (!callee.isMemberExpression()) return;
         if (!callee.get('property').isIdentifier({ name: 'append' })) return;
+
+        // Skip jQuery .append() calls
+        if (isJQueryCall(callee.get('object'))) return;
 
         const args = path.node.arguments;
         const objectNode = callee.get('object').node;
